@@ -15,7 +15,7 @@ export default async function Home() {
       <Image src={logo} alt="Wonkypedia" width={512} height={512} />
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Recent articles</h2>
-        <ul className="grid grid-cols-2 gap-x-4">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-2">
           {articles.map((article) => (
             <li key={article.title}>
               <a
