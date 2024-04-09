@@ -2,11 +2,12 @@
 
 import { useChat } from "ai/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
 import type { Element } from "hast";
+import Search from "@/components/search";
 
 export default function Article({
   title,
@@ -36,28 +37,7 @@ export default function Article({
           </a>
         </div>
         <div className="col-span-9">
-          <form
-            className="flex flex-row items-stretch border rounded overflow-hidden"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const searchQuery = formData.get("search");
-              if (typeof searchQuery === "string") {
-                window.location.href = `/${encodeURIComponent(searchQuery)}`;
-              }
-            }}
-          >
-            <input
-              name="search"
-              type="text"
-              placeholder="Search Wonkypedia"
-              className="flex-grow p-2"
-              autoComplete="off"
-            />
-            <button type="submit" className="p-2 bg-gray-200">
-              Search
-            </button>
-          </form>
+          <Search />
         </div>
         <div className="col-span-3">
           <Contents markdown={markdown} />
@@ -151,16 +131,13 @@ function Contents({ markdown }: { markdown: string }) {
   const headerLinks = headers.map((header, index) =>
     index === 0 ? (
       <li key={index}>
-        <a href="#" className="font-semibold hover:underline">
+        <a href="#" className="font-semibold text-sm hover:underline mb-1">
           (Top)
         </a>
       </li>
     ) : (
-      <li key={index}>
-        <a
-          href={createHashLink(header)}
-          className="text-blue-500 hover:underline"
-        >
+      <li key={index} className="text-blue-500 text-sm hover:underline mb-1">
+        <a href={createHashLink(header)} title={header}>
           {header}
         </a>
       </li>
@@ -172,7 +149,7 @@ function Contents({ markdown }: { markdown: string }) {
   }
 
   return (
-    <div>
+    <div className="sticky top-2">
       <h3 className="text-md mb-2 border-b mt-5 font-semibold">Contents</h3>
       <ul className="mb-4">{headerLinks}</ul>
     </div>
