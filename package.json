@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.1",
+    "@supabase/ssr": "^0.3.0",
+    "@supabase/supabase-js": "^2.42.0",
     "@types/better-sqlite3": "^7.6.9",
     "@uidotdev/usehooks": "^2.4.1",
     "ai": "^3.0.19",

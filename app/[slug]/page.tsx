@@ -1,14 +1,13 @@
-import { db, schema } from "@/db";
-import { eq } from "drizzle-orm";
+import { supabaseServiceClient } from "@/db/service";
 import Article from "./article";
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const title = toTitleCase(decodeURI(params.slug));
 
-  const article = await db
+  const { data: article } = await supabaseServiceClient
+    .from("articles")
     .select()
-    .from(schema.articles)
-    .where(eq(schema.articles.title, title));
+    .eq("slug", params.slug);
 
   return <Article title={title} article={article?.[0]?.content ?? null} />;
 }

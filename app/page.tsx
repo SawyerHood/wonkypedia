@@ -1,14 +1,13 @@
-import { db, schema } from "@/db";
-import { asc, desc } from "drizzle-orm";
+import { supabaseServiceClient } from "@/db/service";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
 import Search from "@/components/search";
 
 export default async function Home() {
-  const articles = await db
+  const { data: articles } = await supabaseServiceClient
+    .from("articles")
     .select()
-    .from(schema.articles)
-    .orderBy(desc(schema.articles.createdAt))
+    .order("created_at", { ascending: false })
     .limit(10);
 
   return (
@@ -18,7 +17,7 @@ export default async function Home() {
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Recent articles</h2>
         <ul className="grid grid-cols-2 gap-x-6 gap-y-2 min-w-fit">
-          {articles.map((article) => (
+          {articles?.map((article) => (
             <li key={article.title}>
               <a
                 href={`/${article.title}`}

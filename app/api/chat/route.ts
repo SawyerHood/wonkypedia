@@ -1,7 +1,7 @@
-import { db, schema } from "@/db";
+import { supabaseServiceClient } from "@/db/service";
+import { slugify } from "@/shared/articleUtils";
 import Anthropic from "@anthropic-ai/sdk";
 import { AnthropicStream, StreamingTextResponse, OpenAIStream } from "ai";
-import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 
 // Create an Anthropic API client (that's edge friendly)
@@ -18,12 +18,10 @@ export async function POST(req: Request) {
 
   const oldTitle = ref ? decodeURI(ref) : null;
 
-  const context = oldTitle
-    ? await db
-        .select()
-        .from(schema.articles)
-        .where(eq(schema.articles.title, oldTitle))
-    : [];
+  const { data: context } = await supabaseServiceClient
+    .from("articles")
+    .select()
+    .eq("title", oldTitle ?? "");
 
   const article = context?.[0];
 
@@ -103,5 +101,7 @@ If you would like to link to another article wrap the article name in [[ ]]. Lin
 Return a lengthy detailed article given the topic. Add multiple headers if appropriate. The title of the article is already inserted`;
 
 function saveToDatabase(title: string, content: string) {
-  return db.insert(schema.articles).values({ title, content });
+  return supabaseServiceClient
+    .from("articles")
+    .insert([{ title, content, slug: slugify(title) }]);
 }
