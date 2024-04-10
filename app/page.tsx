@@ -15,7 +15,7 @@ export default async function Home() {
     .from("articles")
     .select("title, created_at")
     .order("created_at", { ascending: false })
-    .limit(10);
+    .limit(5);
 
   const mostLinkedTitlesPromise = supabaseServiceClient
     .from("linked_to_count")
