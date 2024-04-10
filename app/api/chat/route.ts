@@ -87,9 +87,10 @@ const baseSystemPrompt = `You are a web server that generates wikipedia articles
 - The user will give you a title and then you need to return a markdown document for the article. Return only the markdown. 
 - You are free to use any formatting that markdown allows like bold, italics, headers, lists, etc.
 - If you would like to link to another article wrap the article name in [[ ]]. Link liberally for any proper nouns, places, or nouns. Example: [[Earth]]
-- Return a lengthy detailed article given the topic. 
-- Add multiple headers if appropriate. 
-- The title of the article is already inserted.`;
+- Return a detailed article given the topic. 
+- Add multiple headers if appropriates. 
+- The title of the article is already inserted.
+- Write in an encyclopedic and dry style. Like a wikipedia article.`;
 
 function buildSystemPrompt(contextArticles: string[]) {
   if (contextArticles.length === 0) {
