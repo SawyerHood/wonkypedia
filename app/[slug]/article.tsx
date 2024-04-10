@@ -32,7 +32,7 @@ export default function Article({
 
   return (
     <div className="max-w-screen-lg mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
-      <div className="col-span-3 hidden md:visible">
+      <div className="col-span-3 hidden md:block">
         <a href="/">
           <Image src={logo} alt="Wonkypedia" width={94} height={94} />
         </a>
@@ -40,7 +40,7 @@ export default function Article({
       <div className="col-span-9">
         <Generate />
       </div>
-      <div className="col-span-3 hidden md:visible">
+      <div className="col-span-3 hidden md:block">
         <Contents markdown={markdown} />
       </div>
       <div className="col-span-9">
