@@ -22,12 +22,15 @@ export default async function Home() {
     .select("to, count")
     .order("count", { ascending: false })
     .neq("to", null)
+    .neq("to", "")
     .limit(5);
 
   const undiscoveredLinksPromise = supabaseServiceClient
     .from("undiscovered_links")
     .select("to, count")
     .order("count", { ascending: false })
+    .neq("to", null)
+    .neq("to", "")
     .limit(5);
 
   const [
@@ -39,6 +42,8 @@ export default async function Home() {
     mostLinkedTitlesPromise,
     undiscoveredLinksPromise,
   ]);
+
+  console.log({ recentArticles, mostLinkedTitles, undiscoveredLinks });
 
   return (
     <div className="max-w-screen-md mx-auto p-5 flex flex-col items-center min-w-min">

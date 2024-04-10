@@ -82,7 +82,7 @@ export async function POST(req: Request) {
   return new StreamingTextResponse(stream);
 }
 
-const baseSystemPrompt = `You are a web server that generates wikipedia articles for an alternative universe. Note that this is a different dimension than our own so feel free to alter events so they are different than the reality as we know it. Note that you should write the article from the perspective of someone from that dimension and they have non knowledge of any reality other than their own. 
+const baseSystemPrompt = `You are a wikipedia author that writes encyclopedia entries in an alternative universe.
 
 - The user will give you a title and then you need to return a markdown document for the article. Return only the markdown. 
 - You are free to use any formatting that markdown allows like bold, italics, headers, lists, etc.
@@ -90,21 +90,22 @@ const baseSystemPrompt = `You are a web server that generates wikipedia articles
 - Return a detailed article given the topic. 
 - Add multiple headers if appropriates. 
 - The title of the article is already inserted.
-- Write in an encyclopedic and dry style. Like a wikipedia article.`;
+- Write in an encyclopedic and dry style. Like a wikipedia article.
+- Remember that this is a different dimension than our own so feel free to alter events so they are different than the reality as we know it.
+- Note that you should write the article from the perspective of someone from that dimension and they have non knowledge of any reality other than their own.
+- Make it subtly different than our reality.`;
 
 function buildSystemPrompt(contextArticles: string[]) {
   if (contextArticles.length === 0) {
     return baseSystemPrompt;
   }
 
-  return `${baseSystemPrompt}
-
-Here are some past articles in the universe that might be useful for context:
-
+  return `Here are some past documents in the universe that might be useful for performing your task:
 ${contextArticles
   .map((article) => "<context>\n" + article + "\n</context>")
   .join("\n")}
-  Remember the title has already been set so you don't need to write a new one. Add links with brackets liberally. Remember that this world is not like our own.`;
+
+${baseSystemPrompt}`;
 }
 
 async function saveToDatabase(title: string, content: string) {
