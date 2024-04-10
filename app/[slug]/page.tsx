@@ -4,6 +4,18 @@ import { uriToTitle } from "@/shared/articleUtils";
 
 export const dynamic = "force-dynamic";
 
+// or Dynamic metadata
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const title = uriToTitle(params.slug);
+  return {
+    title: title,
+  };
+}
+
 const loadArticle = async (title: string) => {
   const { data: article } = await supabaseServiceClient
     .from("articles")
