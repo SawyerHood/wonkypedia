@@ -29,9 +29,7 @@ export default function Article({
 
   const thoughts = beforeArticleTag(article ?? response);
 
-  let markdown = article ?? response;
-
-  markdown = afterArticleTag(markdown);
+  let markdown = article ? article : afterArticleTag(response);
 
   markdown = markdown.trimStart();
 

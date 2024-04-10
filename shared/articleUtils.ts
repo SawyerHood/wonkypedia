@@ -48,3 +48,8 @@ export const hasThoughtsTag = (article: string) => {
 export const removeThoughtsTag = (article: string) => {
   return article.replace(/<thoughts>.*?<\/thoughts>/s, "");
 };
+
+export const extractArticle = (article: string) => {
+  const match = article.match(/<article>(.*?)<\/article>/s);
+  return match ? match[1] : null;
+};

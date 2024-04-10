@@ -3,6 +3,7 @@ import {
   afterArticleTag,
   collectAllLinksFromMarkdown,
   createMarkdown,
+  extractArticle,
   removeArticleTag,
   removeThoughtsTag,
 } from "@/shared/articleUtils";
@@ -90,7 +91,7 @@ You are a wikipedia author that writes encyclopedia entries in an alternate time
 - The user will give you a title and then you need to return a markdown document for the article. Return only the markdown. 
 - You are free to use any formatting that markdown allows like bold, italics, headers, lists, etc.
 - If you would like to link to another encyclopedia entry wrap the entry name in [[ ]]. Link liberally for anything that should be an encyclopedia entry. Example: [[Earth]]
-- A topic qualifies for an encyclopedia entry if it has lasting informational significance, appeals broadly, and is supported by factual, credible sources. Suitable subjects include key historical events, notable individuals, fundamental scientific principles, and major cultural practices. Entries should educate, inform, and maintain relevance over time, avoiding promotion or temporary trends.
+- A topic qualifies for an encyclopedia entry if it has lasting informational significance, appeals broadly, and is supported by factual, credible sources. Suitable subjects include key historical events, notable individuals, fundamental scientific principles, major cultural practices, movies, books, and video games. Entries should educate, inform, and maintain relevance over time, avoiding promotion or temporary trends.
 - Do not put any additional formatting inside of links.
 - Return a detailed article given the topic. 
 - Add multiple headers if appropriates. 
@@ -99,7 +100,7 @@ You are a wikipedia author that writes encyclopedia entries in an alternate time
 - Remember that this is a different timeline than our own so feel free to alter events so they are different than the reality as we know it.
 - Note that you should write the article from the perspective of someone from that timeline and they have non knowledge of any reality other than their own.
 - Make it subtly different than our reality, but not over the top.
-- Put your thoughts inside of <thoughts> tags. Inside your thoughts include how this topic is different in this timeline as well as an outline for the article.
+- Put your thoughts inside of <thoughts> tags. Inside your thoughts include how this topic is different in this timeline as well as an outline for the article. Don't change the subject of the article
 - Inside of thoughts also include a list of entries that should be linked to from this entry. Make sure to link them in the actual article.
 - When you are ready put the article inside of <article> tags.`;
 
@@ -119,7 +120,7 @@ ${baseSystemPrompt}`;
 async function saveToDatabase(title: string, content: string) {
   const { error: articleError } = await supabaseServiceClient
     .from("articles")
-    .insert([{ title, content: removeThoughtsTag(content) }]);
+    .insert([{ title, content: extractArticle(content) }]);
 
   if (articleError) throw articleError;
 
