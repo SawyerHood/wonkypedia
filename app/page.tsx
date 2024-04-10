@@ -43,8 +43,6 @@ export default async function Home() {
     undiscoveredLinksPromise,
   ]);
 
-  console.log({ recentArticles, mostLinkedTitles, undiscoveredLinks });
-
   return (
     <div className="max-w-screen-md mx-auto p-5 flex flex-col items-center min-w-min">
       <Image src={logo} alt="Wonkypedia" width={512} height={512} />

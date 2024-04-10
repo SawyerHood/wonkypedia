@@ -1,8 +1,10 @@
 import { supabaseServiceClient } from "@/db/service";
 import {
+  afterArticleTag,
   collectAllLinksFromMarkdown,
   createMarkdown,
   removeArticleTag,
+  removeThoughtsTag,
 } from "@/shared/articleUtils";
 import Anthropic from "@anthropic-ai/sdk";
 import { QueryData } from "@supabase/supabase-js";
@@ -61,12 +63,11 @@ export async function POST(req: Request) {
       ...messages,
       {
         role: "assistant",
-        content: `# ${title}
-<article>`,
+        content: `<thoughts>`,
       },
     ],
     system: systemPrompt,
-    model: SONNET_MODEL,
+    model: HAIKU_MODEL,
     temperature: 1,
     max_tokens: 4000,
   });
@@ -82,18 +83,25 @@ export async function POST(req: Request) {
   return new StreamingTextResponse(stream);
 }
 
-const baseSystemPrompt = `You are a wikipedia author that writes encyclopedia entries in an alternative universe.
+const baseSystemPrompt = `Here are your instructions:
+
+You are a wikipedia author that writes encyclopedia entries in an alternate timeline of the universe.
 
 - The user will give you a title and then you need to return a markdown document for the article. Return only the markdown. 
 - You are free to use any formatting that markdown allows like bold, italics, headers, lists, etc.
-- If you would like to link to another article wrap the article name in [[ ]]. Link liberally for any proper nouns, places, or nouns. Example: [[Earth]]
+- If you would like to link to another encyclopedia entry wrap the entry name in [[ ]]. Link liberally for anything that should be an encyclopedia entry. Example: [[Earth]]
+- A topic qualifies for an encyclopedia entry if it has lasting informational significance, appeals broadly, and is supported by factual, credible sources. Suitable subjects include key historical events, notable individuals, fundamental scientific principles, and major cultural practices. Entries should educate, inform, and maintain relevance over time, avoiding promotion or temporary trends.
+- Do not put any additional formatting inside of links.
 - Return a detailed article given the topic. 
 - Add multiple headers if appropriates. 
 - The title of the article is already inserted.
 - Write in an encyclopedic and dry style. Like a wikipedia article.
-- Remember that this is a different dimension than our own so feel free to alter events so they are different than the reality as we know it.
-- Note that you should write the article from the perspective of someone from that dimension and they have non knowledge of any reality other than their own.
-- Make it subtly different than our reality.`;
+- Remember that this is a different timeline than our own so feel free to alter events so they are different than the reality as we know it.
+- Note that you should write the article from the perspective of someone from that timeline and they have non knowledge of any reality other than their own.
+- Make it subtly different than our reality, but not over the top.
+- Put your thoughts inside of <thoughts> tags. Inside your thoughts include how this topic is different in this timeline as well as an outline for the article.
+- Inside of thoughts also include a list of entries that should be linked to from this entry. Make sure to link them in the actual article.
+- When you are ready put the article inside of <article> tags.`;
 
 function buildSystemPrompt(contextArticles: string[]) {
   if (contextArticles.length === 0) {
@@ -111,7 +119,7 @@ ${baseSystemPrompt}`;
 async function saveToDatabase(title: string, content: string) {
   const { error: articleError } = await supabaseServiceClient
     .from("articles")
-    .insert([{ title, content: removeArticleTag(content) }]);
+    .insert([{ title, content: removeThoughtsTag(content) }]);
 
   if (articleError) throw articleError;
 

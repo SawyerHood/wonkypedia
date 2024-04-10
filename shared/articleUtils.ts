@@ -32,3 +32,19 @@ export const collectAllLinksFromMarkdown = (markdown: string) => {
 export const removeArticleTag = (article: string) => {
   return article.replace(/<\/article>/g, "");
 };
+
+export const afterArticleTag = (article: string) => {
+  return article.split("<article>")[1] ?? "";
+};
+
+export const beforeArticleTag = (article: string) => {
+  return article.split("<article>")[0];
+};
+
+export const hasThoughtsTag = (article: string) => {
+  return article.includes("<thoughts>");
+};
+
+export const removeThoughtsTag = (article: string) => {
+  return article.replace(/<thoughts>.*?<\/thoughts>/s, "");
+};

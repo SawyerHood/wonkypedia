@@ -8,7 +8,12 @@ import logo from "@/assets/wonkypedia.png";
 import type { Element } from "hast";
 import Generate from "@/components/generate";
 import Link from "next/link";
-import { removeArticleTag } from "@/shared/articleUtils";
+import {
+  afterArticleTag,
+  beforeArticleTag,
+  hasThoughtsTag,
+  removeArticleTag,
+} from "@/shared/articleUtils";
 
 export default function Article({
   title,
@@ -22,13 +27,22 @@ export default function Article({
     !article && !localCache.has(title)
   );
 
-  let markdown =
-    `# ${title}` + "\n" + (article?.trimStart() ?? response).trimStart();
+  const thoughts = beforeArticleTag(article ?? response);
+
+  let markdown = article ?? response;
+
+  markdown = afterArticleTag(markdown);
+
+  markdown = markdown.trimStart();
+
+  markdown = markdown.replace(/^(#+ .*\n+)+/, "");
+
+  markdown = `# ${title}` + "\n" + markdown;
 
   markdown = removeArticleTag(
     markdown.replace(
-      /\[\[(.*?)\]\]/g,
-      (_, p1) => `[${p1}](/${encodeURIComponent(p1)})`
+      /\[\[(.*?)(?:\|(.*?))?\]\]/g,
+      (_, p1, p2) => `[${p2 || p1}](/${encodeURIComponent(p1)})`
     )
   );
 
