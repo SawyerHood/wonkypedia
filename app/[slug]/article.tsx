@@ -1,7 +1,6 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import Image from "next/image";
@@ -18,7 +17,10 @@ export default function Article({
   title: string;
   article: string | null;
 }) {
-  const response = useStreamingResponse(title, !article);
+  const response = useStreamingResponse(
+    title,
+    !article && !localCache.has(title)
+  );
 
   let markdown =
     `# ${title}` + "\n" + (article?.trimStart() ?? response).trimStart();
@@ -32,14 +34,14 @@ export default function Article({
 
   return (
     <div className="max-w-screen-lg mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
-      <a href="/" className="flex items-center col-span-9 md:hidden">
+      <Link href="/" className="flex items-center col-span-9 md:hidden">
         <Image src={logo} alt="Wonkypedia" width={50} height={50} />
         <span className="ml-2 text-2xl font-serif">Wonkypedia</span>
-      </a>
+      </Link>
       <div className="col-span-3 hidden md:block">
-        <a href="/">
+        <Link href="/">
           <Image src={logo} alt="Wonkypedia" width={94} height={94} />
-        </a>
+        </Link>
       </div>
       <div className="col-span-9">
         <Generate />
@@ -82,9 +84,9 @@ export default function Article({
             ),
             p: ({ children }) => <p className="text-gray mb-4">{children}</p>,
             a: ({ children, href }) => (
-              <a href={href ?? ""} className="text-blue-500 hover:underline">
+              <Link href={href ?? ""} className="text-blue-500 hover:underline">
                 {children}
-              </a>
+              </Link>
             ),
             ul: ({ children }) => (
               <ul className="list-disc ml-4 mb-4">{children}</ul>
@@ -102,10 +104,10 @@ export default function Article({
   );
 }
 
+const localCache = new Map<string, string>();
+
 function useStreamingResponse(prompt: string, shouldStream: boolean) {
-  const params = useSearchParams();
-  const title = params.get("title");
-  const { append, messages } = useChat({ body: { title } });
+  const { append, messages } = useChat();
   const startedRef = useRef(!shouldStream);
 
   const lastMessage = messages[messages.length - 1];
@@ -114,10 +116,19 @@ function useStreamingResponse(prompt: string, shouldStream: boolean) {
     if (!startedRef.current) {
       append({ role: "user", content: prompt });
     }
+
     startedRef.current = true;
   }, [prompt, append]);
 
-  return lastMessage?.role === "assistant" ? lastMessage.content : "";
+  useEffect(() => {
+    if (lastMessage?.role === "assistant") {
+      localCache.set(prompt, lastMessage.content);
+    }
+  }, [lastMessage, prompt]);
+
+  return lastMessage?.role === "assistant"
+    ? lastMessage.content
+    : localCache.get(prompt) ?? "";
 }
 
 function Contents({ markdown }: { markdown: string }) {

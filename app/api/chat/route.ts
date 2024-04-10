@@ -7,6 +7,7 @@ import {
 import Anthropic from "@anthropic-ai/sdk";
 import { QueryData } from "@supabase/supabase-js";
 import { AnthropicStream, StreamingTextResponse, OpenAIStream } from "ai";
+import { revalidatePath } from "next/cache";
 import OpenAI from "openai";
 
 // Create an Anthropic API client (that's edge friendly)
@@ -22,6 +23,17 @@ export const runtime = "edge";
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
   const { messages } = await req.json();
+  const title = messages[0].content;
+
+  const existingArticleCheck = await supabaseServiceClient
+    .from("articles")
+    .select("title, content")
+    .eq("title", title)
+    .single();
+
+  if (existingArticleCheck.data) {
+    return new Response(existingArticleCheck.data.content);
+  }
 
   const result = supabaseServiceClient
     .from("links")
@@ -42,8 +54,6 @@ export async function POST(req: Request) {
   const systemPrompt = buildSystemPrompt(contextArticles);
 
   console.log(systemPrompt);
-
-  const title = messages[0].content;
 
   // Ask Claude for a streaming chat completion given the prompt
   const response = await anthropic.messages.stream({
@@ -113,6 +123,8 @@ async function saveToDatabase(title: string, content: string) {
   if (linkError) {
     throw linkError;
   }
+
+  revalidatePath("/" + encodeURIComponent(title));
 }
 
 // const openai = new OpenAI({
