@@ -9,7 +9,7 @@ export const titleToUri = (title: string) => {
 };
 
 export const uriToTitle = (uri: string) => {
-  return toTitleCase(decodeURI(uri));
+  return toTitleCase(decodeURI(uri)).trim();
 };
 
 export const createMarkdown = ({
