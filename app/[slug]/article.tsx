@@ -7,7 +7,9 @@ import Markdown from "react-markdown";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
 import type { Element } from "hast";
-import Search from "@/components/search";
+import Generate from "@/components/generate";
+import Link from "next/link";
+import { removeArticleTag } from "@/shared/articleUtils";
 
 export default function Article({
   title,
@@ -18,84 +20,79 @@ export default function Article({
 }) {
   const response = useStreamingResponse(title, !article);
 
-  let markdown = `# ${title}` + (article ?? response);
+  let markdown =
+    `# ${title}` + "\n" + (article?.trimStart() ?? response).trimStart();
 
-  markdown = markdown
-    .replace(
+  markdown = removeArticleTag(
+    markdown.replace(
       /\[\[(.*?)\]\]/g,
-      (_, p1) =>
-        `[${p1}](/${encodeURIComponent(p1)}?ref=${encodeURIComponent(title)})`
+      (_, p1) => `[${p1}](/${encodeURIComponent(p1)})`
     )
-    .replace(/<\/article>/g, "");
+  );
 
   return (
-    <div className="max-w-screen-lg mx-auto p-4 container">
-      <div className="grid grid-cols-12 gap-x-12 gap-y-4">
-        <div className="col-span-3">
-          <a href="/">
-            <Image src={logo} alt="Wonkypedia" width={94} height={94} />
-          </a>
-        </div>
-        <div className="col-span-9">
-          <Search />
-        </div>
-        <div className="col-span-3">
-          <Contents markdown={markdown} />
-        </div>
-        <div className="col-span-9">
-          <Markdown
-            components={{
-              h1: ({ children, node }) => (
-                <h1
-                  className="text-3xl mb-2 pb-2 border-b font-serif"
-                  id={getHeaderId(node)}
-                >
-                  {children}
-                </h1>
-              ),
-              h2: ({ children, node }) => (
-                <h2
-                  className="text-2xl mb-2 pb-2 border-b font-serif"
-                  id={getHeaderId(node)}
-                >
-                  {children}
-                </h2>
-              ),
+    <div className="max-w-screen-lg mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
+      <div className="col-span-3 hidden md:visible">
+        <a href="/">
+          <Image src={logo} alt="Wonkypedia" width={94} height={94} />
+        </a>
+      </div>
+      <div className="col-span-9">
+        <Generate />
+      </div>
+      <div className="col-span-3 hidden md:visible">
+        <Contents markdown={markdown} />
+      </div>
+      <div className="col-span-9">
+        <Markdown
+          components={{
+            h1: ({ children, node }) => (
+              <h1
+                className="text-3xl mb-2 pb-2 border-b font-serif"
+                id={getHeaderId(node)}
+              >
+                {children}
+              </h1>
+            ),
+            h2: ({ children, node }) => (
+              <h2
+                className="text-2xl mb-2 pb-2 border-b font-serif"
+                id={getHeaderId(node)}
+              >
+                {children}
+              </h2>
+            ),
 
-              h3: ({ children, node }) => (
-                <h3
-                  className="text-lg font-semibold mb-2"
-                  id={getHeaderId(node)}
-                >
-                  {children}
-                </h3>
-              ),
-              h4: ({ children, node }) => (
-                <h4
-                  className="text-base font-semibold mb-2"
-                  id={getHeaderId(node)}
-                >
-                  {children}
-                </h4>
-              ),
-              p: ({ children }) => <p className="text-gray mb-4">{children}</p>,
-              a: ({ children, href }) => (
-                <a href={href} className="text-blue-500 hover:underline">
-                  {children}
-                </a>
-              ),
-              ul: ({ children }) => (
-                <ul className="list-disc ml-4 mb-4">{children}</ul>
-              ),
-              li: ({ children }) => <li className="mb-2">{children}</li>,
-              ol: ({ children }) => (
-                <ol className="list-decimal ml-4 mb-4">{children}</ol>
-              ),
-            }}
-          >
-            {markdown}
-          </Markdown>
-        </div>
+            h3: ({ children, node }) => (
+              <h3 className="text-lg font-semibold mb-2" id={getHeaderId(node)}>
+                {children}
+              </h3>
+            ),
+            h4: ({ children, node }) => (
+              <h4
+                className="text-base font-semibold mb-2"
+                id={getHeaderId(node)}
+              >
+                {children}
+              </h4>
+            ),
+            p: ({ children }) => <p className="text-gray mb-4">{children}</p>,
+            a: ({ children, href }) => (
+              <a href={href ?? ""} className="text-blue-500 hover:underline">
+                {children}
+              </a>
+            ),
+            ul: ({ children }) => (
+              <ul className="list-disc ml-4 mb-4">{children}</ul>
+            ),
+            li: ({ children }) => <li className="mb-2">{children}</li>,
+            ol: ({ children }) => (
+              <ol className="list-decimal ml-4 mb-4">{children}</ol>
+            ),
+          }}
+        >
+          {markdown}
+        </Markdown>
       </div>
     </div>
   );
@@ -103,15 +100,14 @@ export default function Article({
 
 function useStreamingResponse(prompt: string, shouldStream: boolean) {
   const params = useSearchParams();
-  const ref = params.get("ref");
-  const { append, messages } = useChat({ body: { ref } });
+  const title = params.get("title");
+  const { append, messages } = useChat({ body: { title } });
   const startedRef = useRef(!shouldStream);
 
   const lastMessage = messages[messages.length - 1];
 
   useEffect(() => {
     if (!startedRef.current) {
-      console.log("yeet");
       append({ role: "user", content: prompt });
     }
     startedRef.current = true;

@@ -1,11 +1,34 @@
-export const slugify = (...args: (string | number)[]): string => {
-  const value = args.join(" ");
+export const toTitleCase = (str: string) => {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+  });
+};
 
-  return value
-    .normalize("NFD") // split an accented letter in the base letter and the acent
-    .replace(/[\u0300-\u036f]/g, "") // remove all previously split accents
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9 ]/g, "") // remove all chars not letters, numbers and spaces (to be replaced)
-    .replace(/\s+/g, "-"); // separator
+export const titleToUri = (title: string) => {
+  return encodeURI(toTitleCase(title));
+};
+
+export const uriToTitle = (uri: string) => {
+  return toTitleCase(decodeURI(uri));
+};
+
+export const createMarkdown = ({
+  title,
+  content,
+}: {
+  title: string;
+  content: string | null;
+}) => {
+  return `# ${title}` + (content ?? "");
+};
+
+export const collectAllLinksFromMarkdown = (markdown: string) => {
+  const links = markdown
+    .match(/\[\[(.*?)\]\]/g)
+    ?.map((link) => link.replace("[[", "").replace("]]", ""));
+  return links ?? [];
+};
+
+export const removeArticleTag = (article: string) => {
+  return article.replace(/<\/article>/g, "");
 };
