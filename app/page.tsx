@@ -5,10 +5,10 @@ import Generate from "@/components/generate";
 import Link from "next/link";
 
 // This will disable caching
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 // Revalidate every minute
-// export const revalidate = 60;
+export const revalidate = 60;
 
 export default async function Home() {
   const recentArticlesPromise = supabaseServiceClient
