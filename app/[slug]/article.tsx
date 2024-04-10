@@ -32,6 +32,10 @@ export default function Article({
 
   return (
     <div className="max-w-screen-lg mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
+      <a href="/" className="flex items-center col-span-9 md:hidden">
+        <Image src={logo} alt="Wonkypedia" width={50} height={50} />
+        <span className="ml-2 text-2xl font-serif">Wonkypedia</span>
+      </a>
       <div className="col-span-3 hidden md:block">
         <a href="/">
           <Image src={logo} alt="Wonkypedia" width={94} height={94} />
