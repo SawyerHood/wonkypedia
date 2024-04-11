@@ -16,21 +16,27 @@ import MarkdownRenderer, {
 } from "@/components/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
+import { Database } from "@/db/schema";
 
 export default function Article({
   title,
   article,
 }: {
   title: string;
-  article: string | null;
+  article: Database["public"]["Tables"]["articles"]["Row"] | null;
 }) {
   const {
-    article: response,
-    infobox,
-    imgUrl,
-  } = useGeneratedArticle(title, !article && !localCache.has(title));
+    article: streamedResponse,
+    infobox: streamedInfoBox,
+    imgUrl: streamedImgUrl,
+  } = useGeneratedArticle(title, !article);
 
-  let markdown = article ? article : afterArticleTag(response ?? "");
+  const infobox = article?.infobox ?? streamedInfoBox;
+  const imgUrl = article?.image_url ?? streamedImgUrl;
+
+  let markdown = article?.content
+    ? article?.content
+    : afterArticleTag(streamedResponse ?? "");
 
   markdown = markdown.trimStart();
 
@@ -59,8 +65,8 @@ export default function Article({
       </div>
       <div className="col-span-9">
         {infobox && (
-          <div className="float-right bg-white pl-4 pb-4 max-w-xs">
-            <Infobox infobox={infobox} title={title} imgUrl={imgUrl} />
+          <div className="md:float-right md:max-w-xs md:pl-4 md:pb-4 max-w-full bg-white">
+            <Infobox infobox={infobox as any} title={title} imgUrl={imgUrl} />
           </div>
         )}
         <MarkdownRenderer markdown={markdown} />
@@ -102,7 +108,9 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
         }
       }
     };
-    fetchArticle(title, onChunk);
+    fetchArticle(title, onChunk).then(() => {
+      console.log(article);
+    });
   }, [title, shouldStream]);
   return { article, infobox, imgUrl };
 }

@@ -22,7 +22,7 @@ export const createMarkdown = ({
   return `# ${title}` + (content ?? "");
 };
 
-export const collectAllLinksFromMarkdown = (markdown: string) => {
+export const collectAllLinksFromString = (markdown: string) => {
   const links = markdown
     .match(/\[\[(.*?)\]\]/g)
     ?.map((link) => link.replace("[[", "").replace("]]", ""));

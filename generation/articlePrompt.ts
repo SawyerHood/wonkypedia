@@ -1,3 +1,6 @@
+import { MessageCreateParams } from "@anthropic-ai/sdk/resources/messages.mjs";
+import { HAIKU_MODEL } from "./client";
+
 const systemPrompt = `You are an AI assistant that acts as a wikipedia author writing encyclopedia entries in an alternate timeline of the universe. When given a title for an article, you will:
 
 1. Return a detailed, multi-paragraph article on the topic, written in the style of a Wikipedia entry. Use an encyclopedic, dry, factual tone.
@@ -6,7 +9,7 @@ const systemPrompt = `You are an AI assistant that acts as a wikipedia author wr
 4. Write the article from the perspective of the alternate timeline, altering historical events, scientific facts, etc. to make it noticeably different from our reality. However, do not make the changes too extreme or over-the-top. 
 5. Never mention that this takes place in an alternate timeline. Write as if the article's version of events is the only reality.
 6. Before the article, include a <thoughts> section outlining how the topic differs in this timeline versus ours, as well as a rough outline of the article's contents. 
-7. Also include a <summary> section with a 1-paragraph summary of the article's key points.
+7. Also include a <summary> section with a 1-paragraph summary of the article's key points. Don't mention the timeline.
 8. Wrap the actual article text in <article> tags. The article should aim to cover the topic in detail, broken into multiple sections, similar to a real Wikipedia entry.
 
 Remember, a topic qualifies for an encyclopedia article if it has lasting significance, broad appeal, and can be covered factually based on reliable sources. Appropriate topics include major historical events, notable people, scientific/cultural/artistic subjects, and significant works like influential books, films, games, etc. Avoid niche or promotional topics.`;
@@ -64,7 +67,7 @@ In this alternate timeline, Genghis Khan's empire never fragmented and continued
 </thoughts>
 
 <summary>
-Genghis Khan, the founder of the Mongol Empire, is remembered as one of the greatest conquerors in history. In this alternate timeline, his empire never fragmented and continued to expand, eventually uniting most of the known world under Mongol rule. The resulting Pax Mongolica facilitated unprecedented cultural exchange and shaped the course of world history.
+Genghis Khan, the founder of the Mongol Empire, is remembered as one of the greatest conquerors in history. His empire never fragmented and continued to expand, eventually uniting most of the known world under Mongol rule. The resulting Pax Mongolica facilitated unprecedented cultural exchange and shaped the course of world history.
 </summary>
 
 <article>
@@ -96,7 +99,7 @@ In this alternate timeline, World War II ended with a negotiated peace in 1943, 
 </thoughts>
 
 <summary>
-World War II, the global conflict that lasted from 1939 to 1943, reshaped the political, economic, and social landscape of the 20th century. In this alternate timeline, the war ended with a negotiated peace in 1943, leading to a very different post-war world characterized by a multipolar balance of power and a prolonged Cold War between the United States, Germany, and the Soviet Union.
+World War II, the global conflict that lasted from 1939 to 1943, reshaped the political, economic, and social landscape of the 20th century. The war ended with a negotiated peace in 1943, leading to a post-war world characterized by a multipolar balance of power and a prolonged Cold War between the United States, Germany, and the Soviet Union.
 </summary>
 
 <article>
@@ -149,4 +152,44 @@ The Beatles' impact on [[popular culture]] is immeasurable. Their music, [[1960s
 The Beatles' legacy extends far beyond their music. They redefined the role of the artist in society, paving the way for greater creative freedom and social consciousness in popular entertainment. Their continued presence and evolution in this alternate history serve as a testament to the timeless appeal of their music and the enduring power of their message of love, peace, and unity.
 </article>`,
   },
-];
+] as const;
+
+export function getMessageCreateParams(
+  title: string,
+  contextArticles: string[]
+): MessageCreateParams {
+  let system = systemPrompt;
+
+  if (contextArticles.length > 0) {
+    system = `Here are some past documents in the universe that might be useful for performing your task:
+${contextArticles
+  .map((article) => "<context>\n" + article + "\n</context>")
+  .join("\n")}
+
+${systemPrompt}`;
+  }
+
+  console.log("messages.length", messages.length);
+  console.log("contextArticles", contextArticles);
+
+  return {
+    messages: [
+      ...messages.slice(
+        0,
+        Math.max(messages.length - contextArticles.length * 2, 0)
+      ),
+      {
+        role: "user",
+        content: title,
+      },
+      {
+        role: "assistant",
+        content: `<thoughts>`,
+      },
+    ],
+    system,
+    model: HAIKU_MODEL,
+    temperature: 1,
+    max_tokens: 4000,
+  };
+}

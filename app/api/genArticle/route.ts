@@ -1,7 +1,7 @@
 import { supabaseServiceClient } from "@/db/service";
-import { HAIKU_MODEL, anthropic } from "@/generation/client";
+import { anthropic } from "@/generation/client";
 import {
-  collectAllLinksFromMarkdown,
+  collectAllLinksFromString,
   createMarkdown,
   extractArticle,
   slugify,
@@ -11,6 +11,8 @@ import { revalidatePath } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { genAndUploadImage } from "@/generation/image";
 import { encodeMessage } from "@/shared/encoding";
+import { getMessageCreateParams } from "@/generation/articlePrompt";
+import { Json } from "@/db/schema";
 
 export const runtime = "edge";
 
@@ -34,9 +36,11 @@ export async function POST(req: Request) {
         let articleResult = "";
         let infoBoxPromise: Promise<void> | null = null;
 
-        async function startInfoBox() {
-          const [thoughts] = articleResult.split("</thoughts>");
-          const infoBox = await generateInfobox(`Title: ${title}\n` + thoughts);
+        async function startInfoBox(summary: string) {
+          const infoBox = await generateInfobox(summary);
+
+          await saveInfoboxToDatabase(title, infoBox);
+
           controller.enqueue(
             encodeMessage({
               type: "info-box",
@@ -49,6 +53,7 @@ export async function POST(req: Request) {
               infoBox.imageDescription,
               slugify(title)
             );
+            await saveImageToDatabase(title, image);
             controller.enqueue(
               encodeMessage({
                 type: "image",
@@ -66,8 +71,14 @@ export async function POST(req: Request) {
 
           articleResult += value;
 
-          if (!infoBoxPromise && articleResult.includes("</thoughts>")) {
-            infoBoxPromise = startInfoBox();
+          if (!infoBoxPromise) {
+            const summaryContentMatch = articleResult.match(
+              /<summary>(.*?)<\/summary>/s
+            );
+            if (summaryContentMatch && summaryContentMatch[1]) {
+              const summaryContent = summaryContentMatch[1];
+              infoBoxPromise = startInfoBox(summaryContentMatch[1]);
+            }
           }
 
           controller.enqueue(encodeMessage({ type: "article-chunk", value }));
@@ -78,63 +89,72 @@ export async function POST(req: Request) {
       },
     }).pipeThrough(new TextEncoderStream())
   );
-
-  // Respond with the stream
-  //   return new StreamingTextResponse(stream);
-}
-
-const baseSystemPrompt = `Here are your instructions:
-
-You are a wikipedia author that writes encyclopedia entries in an alternate timeline of the universe.
-
-- The user will give you a title and then you need to return a markdown document for the article. Return only the markdown. 
-- You are free to use any formatting that markdown allows like bold, italics, headers, lists, etc.
-- If you would like to link to another encyclopedia entry wrap the entry name in [[ ]]. Link liberally for anything that should be an encyclopedia entry. Example: [[Earth]]
-- A topic qualifies for an encyclopedia entry if it has lasting informational significance, appeals broadly, and is supported by factual, credible sources. Suitable subjects include key historical events, notable individuals, fundamental scientific principles, major cultural practices, movies, books, and video games. Entries should educate, inform, and maintain relevance over time, avoiding promotion or temporary trends.
-- Do not put any additional formatting inside of links.
-- Return a detailed article given the topic. 
-- Add multiple headers if appropriates. 
-- The title of the article is already inserted.
-- Write in an encyclopedic and dry style. Like a wikipedia article.
-- Remember that this is a different timeline than our own so feel free to alter events so they are different than the reality as we know it.
-- Note that you should write the article from the perspective of someone from that timeline and they have non knowledge of any reality other than their own.
-- Make it subtly different than our reality, but not over the top.
-- Put your thoughts inside of <thoughts> tags. Inside your thoughts include how this topic is different in this timeline as well as an outline for the article. Don't change the subject of the article
-- Inside of thoughts also include a list of entries that should be linked to from this entry. Make sure to link them in the actual article.
-- When you are ready put the article inside of <article> tags.`;
-
-function buildSystemPrompt(contextArticles: string[]) {
-  if (contextArticles.length === 0) {
-    return baseSystemPrompt;
-  }
-
-  return `Here are some past documents in the universe that might be useful for performing your task:
-${contextArticles
-  .map((article) => "<context>\n" + article + "\n</context>")
-  .join("\n")}
-
-${baseSystemPrompt}`;
 }
 
 async function saveToDatabase(title: string, content: string) {
   const { error: articleError } = await supabaseServiceClient
     .from("articles")
-    .insert([{ title, content: extractArticle(content) }]);
+    .upsert([{ title, content: extractArticle(content) }], {
+      onConflict: "title",
+    });
 
   if (articleError) throw articleError;
 
   const markdown = createMarkdown({ title, content });
-  const links = collectAllLinksFromMarkdown(markdown);
+  const links = collectAllLinksFromString(markdown);
 
-  const { error: linkError } = await supabaseServiceClient
-    .from("links")
-    .insert(links.map((link) => ({ from: title, to: link })));
-
-  if (linkError) {
-    throw linkError;
-  }
+  await saveLinksToDatabase(title, links);
 
   revalidatePath("/" + encodeURIComponent(title));
+}
+
+function getAllLinksFromInfobox(infobox: Json, links: string[] = []) {
+  if (typeof infobox === "string") {
+    links.push(...collectAllLinksFromString(infobox));
+  } else if (Array.isArray(infobox)) {
+    infobox.forEach((link) => {
+      getAllLinksFromInfobox(link, links);
+    });
+  } else if (infobox && typeof infobox === "object") {
+    for (const val of Object.values(infobox)) {
+      getAllLinksFromInfobox(val ?? null, links);
+    }
+  }
+  return links;
+}
+
+async function saveInfoboxToDatabase(title: string, infoBox: Json) {
+  const { error: infoBoxError } = await supabaseServiceClient
+    .from("articles")
+    .upsert([{ title, infobox: infoBox }], {
+      onConflict: "title",
+    });
+
+  if (infoBoxError) throw infoBoxError;
+
+  const links = getAllLinksFromInfobox(infoBox);
+  await saveLinksToDatabase(title, links);
+}
+
+async function saveImageToDatabase(title: string, image: string) {
+  const { error: imageError } = await supabaseServiceClient
+    .from("articles")
+    .upsert([{ title, image_url: image }], {
+      onConflict: "title",
+    });
+
+  if (imageError) throw imageError;
+}
+
+async function saveLinksToDatabase(title: string, links: string[]) {
+  const { error: linkError } = await supabaseServiceClient.from("links").upsert(
+    links.map((link) => ({ from: title, to: link })),
+    {
+      onConflict: "from, to",
+    }
+  );
+
+  if (linkError) throw linkError;
 }
 
 async function createArticleStream(title: string) {
@@ -164,25 +184,12 @@ async function createArticleStream(title: string) {
     .filter((link) => link.from)
     .map((link) => createMarkdown(link.from as any));
 
-  const systemPrompt = buildSystemPrompt(contextArticles);
+  const params = getMessageCreateParams(title, contextArticles);
+
+  console.log(params);
 
   // Ask Claude for a streaming chat completion given the prompt
-  const response = anthropic.messages.stream({
-    messages: [
-      {
-        role: "user",
-        content: title,
-      },
-      {
-        role: "assistant",
-        content: `<thoughts>`,
-      },
-    ],
-    system: systemPrompt,
-    model: HAIKU_MODEL,
-    temperature: 1,
-    max_tokens: 4000,
-  });
+  const response = anthropic.messages.stream(params);
 
   // Convert the response into a friendly text-stream
   const stream = AnthropicStream(response, {

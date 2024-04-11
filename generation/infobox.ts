@@ -35,7 +35,8 @@ An infobox on Wikipedia serves to succinctly summarize key information about the
 - Return only the JSON object.
 - If you would like to link to another encyclopedia entry wrap the entry name in [[ ]]. Link liberally for anything that should be an encyclopedia entry. Example: [[Earth]]
 - If the info box shouldn't contain an image, don't include the imageDescription key.
-- Don't just summarize the outline, add supplemental information to the infobox.
+- If the info box is about a proper noun, make sure to mention it in the imageDescription.
+- Don't summarize the outline, add supplemental metadata to the infobox.
 
 The returned JSON must conform to this typescript type:
 
@@ -47,7 +48,7 @@ type JSON = {
 Here is an example from the article "Paul McCartney":
 <example>
 {
-    imageDescription: "A photo of Paul McCartney. A dignified older gentleman with a warm expression stands in the foreground. His hairstyle is a tousled blend of blonde and grey, falling just above his shoulders. He appears attentive and kind, with a soft smile and eyes that suggest a wealth of experience. He's dressed in a refined, dark suit jacket paired with a collared shirt. A notable feature is the red poppy pin on his lapel, symbolizing remembrance and respect for military service. The background is blurred, drawing attention to the man’s gentle demeanor and the poppy's vibrant color.",
+    "imageDescription": "A photo of Paul McCartney. A dignified older gentleman with a warm expression stands in the foreground. His hairstyle is a tousled blend of blonde and grey, falling just above his shoulders. He appears attentive and kind, with a soft smile and eyes that suggest a wealth of experience. He's dressed in a refined, dark suit jacket paired with a collared shirt. A notable feature is the red poppy pin on his lapel, symbolizing remembrance and respect for military service. The background is blurred, drawing attention to the man’s gentle demeanor and the poppy's vibrant color.",
     "Born": "18 June 1942 (age 81) [[Liverpool]], England",
     "Other names": [
       "Macca",
