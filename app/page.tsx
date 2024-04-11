@@ -1,7 +1,7 @@
 import { supabaseServiceClient } from "@/db/service";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
-import Generate from "@/components/Generate";
+import Generate from "@/ui/Generate";
 import Link from "next/link";
 
 // This will disable caching

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
-import Generate from "@/components/Generate";
+import Generate from "@/ui/Generate";
 import Link from "next/link";
 import {
   afterArticleTag,
@@ -11,9 +11,7 @@ import {
   linkify,
   removeArticleTag,
 } from "@/shared/articleUtils";
-import MarkdownRenderer, {
-  LinkOnlyRenderer,
-} from "@/components/MarkdownRenderer";
+import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
 import { Database } from "@/db/schema";
