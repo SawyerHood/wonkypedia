@@ -1,6 +1,5 @@
 "use client";
 
-import { useChat } from "ai/react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
@@ -8,7 +7,6 @@ import Generate from "@/components/Generate";
 import Link from "next/link";
 import {
   afterArticleTag,
-  beforeArticleTag,
   createHashLink,
   linkify,
   removeArticleTag,
@@ -165,7 +163,7 @@ function Infobox({
             ([key, value]) =>
               key !== "imageDescription" && (
                 <tr key={key}>
-                  <td className="font-bold p-1">{key}</td>
+                  <td className="font-bold p-1 min-w-24">{key}</td>
                   <td className="p-1">
                     <LinkOnlyRenderer
                       markdown={linkify(
@@ -212,3 +210,14 @@ async function fetchArticle(title: string, onChunk: (chunk: string) => void) {
     throw error;
   }
 }
+
+const LoadingSkeleton = () => {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="h-10 bg-gray-300 rounded"></div>
+      <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+      <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+      <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+    </div>
+  );
+};

@@ -6,7 +6,7 @@ import {
   extractArticle,
   slugify,
 } from "@/shared/articleUtils";
-import { AnthropicStream, StreamingTextResponse, OpenAIStream } from "ai";
+import { AnthropicStream } from "ai";
 import { revalidatePath } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { genAndUploadImage } from "@/generation/image";
