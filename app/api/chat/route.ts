@@ -1,25 +1,12 @@
 import { supabaseServiceClient } from "@/db/service";
+import { HAIKU_MODEL, anthropic } from "@/generation/client";
 import {
-  afterArticleTag,
   collectAllLinksFromMarkdown,
   createMarkdown,
   extractArticle,
-  removeArticleTag,
-  removeThoughtsTag,
 } from "@/shared/articleUtils";
-import Anthropic from "@anthropic-ai/sdk";
-import { QueryData } from "@supabase/supabase-js";
 import { AnthropicStream, StreamingTextResponse, OpenAIStream } from "ai";
 import { revalidatePath } from "next/cache";
-import OpenAI from "openai";
-
-// Create an Anthropic API client (that's edge friendly)
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
-
-const HAIKU_MODEL = "claude-3-haiku-20240307";
-const SONNET_MODEL = "claude-3-sonnet-20240229";
 
 export const runtime = "edge";
 
@@ -59,7 +46,7 @@ export async function POST(req: Request) {
   console.log(systemPrompt);
 
   // Ask Claude for a streaming chat completion given the prompt
-  const response = await anthropic.messages.stream({
+  const response = anthropic.messages.stream({
     messages: [
       ...messages,
       {

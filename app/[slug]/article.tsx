@@ -1,19 +1,21 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { useEffect, useRef } from "react";
-import Markdown from "react-markdown";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
-import type { Element } from "hast";
-import Generate from "@/components/generate";
+import Generate from "@/components/Generate";
 import Link from "next/link";
 import {
   afterArticleTag,
   beforeArticleTag,
-  hasThoughtsTag,
+  createHashLink,
+  linkify,
   removeArticleTag,
 } from "@/shared/articleUtils";
+import MarkdownRenderer, {
+  LinkOnlyRenderer,
+} from "@/components/MarkdownRenderer";
 
 export default function Article({
   title,
@@ -27,6 +29,10 @@ export default function Article({
     !article && !localCache.has(title)
   );
 
+  const { infobox, isLoading } = useInfobox(title, !!article);
+
+  console.log(infobox);
+
   const thoughts = beforeArticleTag(article ?? response);
 
   let markdown = article ? article : afterArticleTag(response);
@@ -37,15 +43,10 @@ export default function Article({
 
   markdown = `# ${title}` + "\n" + markdown;
 
-  markdown = removeArticleTag(
-    markdown.replace(
-      /\[\[(.*?)(?:\|(.*?))?\]\]/g,
-      (_, p1, p2) => `[${p2 || p1}](/${encodeURIComponent(p1)})`
-    )
-  );
+  markdown = removeArticleTag(linkify(markdown));
 
   return (
-    <div className="max-w-screen-lg mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
+    <div className="max-w-screen-xl mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
       <Link href="/" className="flex items-center col-span-9 md:hidden">
         <Image src={logo} alt="Wonkypedia" width={50} height={50} />
         <span className="ml-2 text-2xl font-serif">Wonkypedia</span>
@@ -62,55 +63,12 @@ export default function Article({
         <Contents markdown={markdown} />
       </div>
       <div className="col-span-9">
-        <Markdown
-          components={{
-            h1: ({ children, node }) => (
-              <h1
-                className="text-3xl mb-2 pb-2 border-b font-serif"
-                id={getHeaderId(node)}
-              >
-                {children}
-              </h1>
-            ),
-            h2: ({ children, node }) => (
-              <h2
-                className="text-2xl mb-2 pb-2 border-b font-serif"
-                id={getHeaderId(node)}
-              >
-                {children}
-              </h2>
-            ),
-
-            h3: ({ children, node }) => (
-              <h3 className="text-lg font-semibold mb-2" id={getHeaderId(node)}>
-                {children}
-              </h3>
-            ),
-            h4: ({ children, node }) => (
-              <h4
-                className="text-base font-semibold mb-2"
-                id={getHeaderId(node)}
-              >
-                {children}
-              </h4>
-            ),
-            p: ({ children }) => <p className="text-gray mb-4">{children}</p>,
-            a: ({ children, href }) => (
-              <Link href={href ?? ""} className="text-blue-500 hover:underline">
-                {children}
-              </Link>
-            ),
-            ul: ({ children }) => (
-              <ul className="list-disc ml-4 mb-4">{children}</ul>
-            ),
-            li: ({ children }) => <li className="mb-2">{children}</li>,
-            ol: ({ children }) => (
-              <ol className="list-decimal ml-4 mb-4">{children}</ol>
-            ),
-          }}
-        >
-          {markdown}
-        </Markdown>
+        {infobox && (
+          <div className="float-right bg-white pl-4 pb-4 max-w-xs">
+            <Infobox infobox={infobox} title={title} />
+          </div>
+        )}
+        <MarkdownRenderer markdown={markdown} />
       </div>
     </div>
   );
@@ -141,6 +99,35 @@ function useStreamingResponse(prompt: string, shouldStream: boolean) {
   return lastMessage?.role === "assistant"
     ? lastMessage.content
     : localCache.get(prompt) ?? "";
+}
+
+function useInfobox(title: string, shouldFetch: boolean) {
+  const [infobox, setInfobox] = useState<{ [key: string]: string } | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (shouldFetch && !startedRef.current) {
+      startedRef.current = true;
+      setIsLoading(true);
+      fetch("/api/infobox", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setInfobox(data);
+          setIsLoading(false);
+        });
+    }
+  }, [shouldFetch, setInfobox, setIsLoading, title]);
+
+  return { infobox, isLoading };
 }
 
 function Contents({ markdown }: { markdown: string }) {
@@ -179,12 +166,40 @@ function Contents({ markdown }: { markdown: string }) {
   );
 }
 
-function createHashLink(header: string) {
-  return `#${header.toLowerCase().replace(/\s+/g, "-")}`;
-}
-
-function getHeaderId(node: Element | undefined) {
-  return node?.children?.[0]?.type === "text"
-    ? createHashLink(String(node.children?.[0]?.value)).slice(1)
-    : "";
+function Infobox({
+  infobox,
+  title,
+}: {
+  infobox: { [key: string]: string };
+  title: string;
+}) {
+  console.log(infobox);
+  return (
+    <div className="bg-gray-100 p-4 rounded-lg">
+      <h2 className="text-lg font-bold mb-2">{title}</h2>
+      {infobox.imageUrl && (
+        <img src={infobox.imageUrl} alt={title} className="mb-4 w-full" />
+      )}
+      <table className="text-xs border-spacing-4">
+        <tbody>
+          {Object.entries(infobox).map(
+            ([key, value]) =>
+              key !== "imageUrl" &&
+              key !== "imageDescription" && (
+                <tr key={key}>
+                  <td className="font-bold p-1">{key}</td>
+                  <td className="p-1">
+                    <LinkOnlyRenderer
+                      markdown={linkify(
+                        Array.isArray(value) ? value.join(" • ") : value
+                      )}
+                    />
+                  </td>
+                </tr>
+              )
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 }
