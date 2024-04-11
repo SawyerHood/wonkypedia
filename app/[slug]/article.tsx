@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -64,7 +65,11 @@ export default function Article({
       <div className="col-span-9">
         {infobox && (
           <div className="md:float-right md:max-w-xs md:pl-4 md:pb-4 max-w-full bg-white">
-            <Infobox infobox={infobox as any} title={title} imgUrl={imgUrl} />
+            <Infobox
+              infobox={infobox as any}
+              title={title}
+              imgUrl={imgUrl ?? null}
+            />
           </div>
         )}
         <MarkdownRenderer markdown={markdown} />
