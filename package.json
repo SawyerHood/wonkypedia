@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "migrate": "tsx ./migrate.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.1",
@@ -17,10 +16,7 @@
     "@supabase/supabase-js": "^2.42.0",
     "@types/better-sqlite3": "^7.6.9",
     "@types/throttle-debounce": "^5.0.2",
-    "@uidotdev/usehooks": "^2.4.1",
     "ai": "^3.0.19",
-    "better-sqlite3": "^9.4.5",
-    "drizzle-orm": "^0.30.7",
     "next": "14.1.4",
     "openai": "^4.33.0",
     "react": "^18",
