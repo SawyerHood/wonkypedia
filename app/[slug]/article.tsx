@@ -64,7 +64,7 @@ export default function Article({
       </div>
       <div className="col-span-9">
         {infobox && (
-          <div className="md:float-right md:max-w-xs md:pl-4 md:pb-4 max-w-full bg-white">
+          <div className="md:float-right md:max-w-xs md:pl-4 pb-4 max-w-full bg-white">
             <Infobox
               infobox={infobox as any}
               title={title}
@@ -190,7 +190,6 @@ function Infobox({
   title: string;
   imgUrl: string | null;
 }) {
-  console.log(infobox);
   return (
     <div className="bg-gray-100 p-4 rounded-lg">
       <h2 className="text-lg font-bold mb-2">{title}</h2>
