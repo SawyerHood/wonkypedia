@@ -22,7 +22,7 @@ export const createMarkdown = ({
   return `# ${title}` + (content ?? "");
 };
 
-export const collectAllLinksFromMarkdown = (markdown: string) => {
+export const collectAllLinksFromString = (markdown: string) => {
   const links = markdown
     .match(/\[\[(.*?)\]\]/g)
     ?.map((link) => link.replace("[[", "").replace("]]", ""));
@@ -53,3 +53,22 @@ export const extractArticle = (article: string) => {
   const match = article.match(/<article>(.*?)<\/article>/s);
   return match ? match[1] : null;
 };
+
+export const linkify = (text: string) => {
+  return text.replace(
+    /\[\[(.*?)(?:\|(.*?))?\]\]/g,
+    (_, p1, p2) => `[${p2 || p1}](/${encodeURIComponent(p1)})`
+  );
+};
+
+export function createHashLink(header: string) {
+  return `#${header.toLowerCase().replace(/\s+/g, "-")}`;
+}
+
+export function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9]/g, "");
+}

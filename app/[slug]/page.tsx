@@ -28,5 +28,5 @@ export default async function Page({ params }: { params: { slug: string } }) {
   const title = uriToTitle(params.slug);
   const article = await loadArticle(title);
 
-  return <Article title={title} article={article?.[0]?.content ?? null} />;
+  return <Article title={title} article={article?.[0] ?? null} />;
 }

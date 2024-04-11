@@ -1,35 +1,42 @@
 "use client";
 
-import { useChat } from "ai/react";
-import { useEffect, useRef } from "react";
-import Markdown from "react-markdown";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
-import type { Element } from "hast";
-import Generate from "@/components/generate";
+import Generate from "@/components/Generate";
 import Link from "next/link";
 import {
   afterArticleTag,
-  beforeArticleTag,
-  hasThoughtsTag,
+  createHashLink,
+  linkify,
   removeArticleTag,
 } from "@/shared/articleUtils";
+import MarkdownRenderer, {
+  LinkOnlyRenderer,
+} from "@/components/MarkdownRenderer";
+import { decodeChunk } from "@/shared/encoding";
+import { throttle } from "throttle-debounce";
+import { Database } from "@/db/schema";
 
 export default function Article({
   title,
   article,
 }: {
   title: string;
-  article: string | null;
+  article: Database["public"]["Tables"]["articles"]["Row"] | null;
 }) {
-  const response = useStreamingResponse(
-    title,
-    !article && !localCache.has(title)
-  );
+  const {
+    article: streamedResponse,
+    infobox: streamedInfoBox,
+    imgUrl: streamedImgUrl,
+  } = useGeneratedArticle(title, !article);
 
-  const thoughts = beforeArticleTag(article ?? response);
+  const infobox = article?.infobox ?? streamedInfoBox;
+  const imgUrl = article?.image_url ?? streamedImgUrl;
 
-  let markdown = article ? article : afterArticleTag(response);
+  let markdown = article?.content
+    ? article?.content
+    : afterArticleTag(streamedResponse ?? "");
 
   markdown = markdown.trimStart();
 
@@ -37,15 +44,10 @@ export default function Article({
 
   markdown = `# ${title}` + "\n" + markdown;
 
-  markdown = removeArticleTag(
-    markdown.replace(
-      /\[\[(.*?)(?:\|(.*?))?\]\]/g,
-      (_, p1, p2) => `[${p2 || p1}](/${encodeURIComponent(p1)})`
-    )
-  );
+  markdown = removeArticleTag(linkify(markdown));
 
   return (
-    <div className="max-w-screen-lg mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
+    <div className="max-w-screen-xl mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
       <Link href="/" className="flex items-center col-span-9 md:hidden">
         <Image src={logo} alt="Wonkypedia" width={50} height={50} />
         <span className="ml-2 text-2xl font-serif">Wonkypedia</span>
@@ -62,55 +64,12 @@ export default function Article({
         <Contents markdown={markdown} />
       </div>
       <div className="col-span-9">
-        <Markdown
-          components={{
-            h1: ({ children, node }) => (
-              <h1
-                className="text-3xl mb-2 pb-2 border-b font-serif"
-                id={getHeaderId(node)}
-              >
-                {children}
-              </h1>
-            ),
-            h2: ({ children, node }) => (
-              <h2
-                className="text-2xl mb-2 pb-2 border-b font-serif"
-                id={getHeaderId(node)}
-              >
-                {children}
-              </h2>
-            ),
-
-            h3: ({ children, node }) => (
-              <h3 className="text-lg font-semibold mb-2" id={getHeaderId(node)}>
-                {children}
-              </h3>
-            ),
-            h4: ({ children, node }) => (
-              <h4
-                className="text-base font-semibold mb-2"
-                id={getHeaderId(node)}
-              >
-                {children}
-              </h4>
-            ),
-            p: ({ children }) => <p className="text-gray mb-4">{children}</p>,
-            a: ({ children, href }) => (
-              <Link href={href ?? ""} className="text-blue-500 hover:underline">
-                {children}
-              </Link>
-            ),
-            ul: ({ children }) => (
-              <ul className="list-disc ml-4 mb-4">{children}</ul>
-            ),
-            li: ({ children }) => <li className="mb-2">{children}</li>,
-            ol: ({ children }) => (
-              <ol className="list-decimal ml-4 mb-4">{children}</ol>
-            ),
-          }}
-        >
-          {markdown}
-        </Markdown>
+        {infobox && (
+          <div className="md:float-right md:max-w-xs md:pl-4 md:pb-4 max-w-full bg-white">
+            <Infobox infobox={infobox as any} title={title} imgUrl={imgUrl} />
+          </div>
+        )}
+        <MarkdownRenderer markdown={markdown} />
       </div>
     </div>
   );
@@ -118,29 +77,42 @@ export default function Article({
 
 const localCache = new Map<string, string>();
 
-function useStreamingResponse(prompt: string, shouldStream: boolean) {
-  const { append, messages } = useChat();
-  const startedRef = useRef(!shouldStream);
-
-  const lastMessage = messages[messages.length - 1];
-
+function useGeneratedArticle(title: string, shouldStream: boolean) {
+  const [article, setArticle] = useState<string | null>(null);
+  const [infobox, setInfobox] = useState<{ [key: string]: string } | null>(
+    null
+  );
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const startedRef = useRef(false);
   useEffect(() => {
-    if (!startedRef.current) {
-      append({ role: "user", content: prompt });
+    if (!shouldStream || startedRef.current) {
+      return;
     }
-
     startedRef.current = true;
-  }, [prompt, append]);
-
-  useEffect(() => {
-    if (lastMessage?.role === "assistant") {
-      localCache.set(prompt, lastMessage.content);
-    }
-  }, [lastMessage, prompt]);
-
-  return lastMessage?.role === "assistant"
-    ? lastMessage.content
-    : localCache.get(prompt) ?? "";
+    let article = "";
+    const setArticleThrottled = throttle(100, setArticle);
+    const onChunk = (chunk: string) => {
+      const messages = decodeChunk(chunk);
+      for (const message of messages) {
+        switch (message.type) {
+          case "article-chunk":
+            article += message.value;
+            setArticleThrottled(article);
+            break;
+          case "info-box":
+            setInfobox(JSON.parse(message.value));
+            break;
+          case "image":
+            setImgUrl(message.value);
+            break;
+        }
+      }
+    };
+    fetchArticle(title, onChunk).then(() => {
+      console.log(article);
+    });
+  }, [title, shouldStream]);
+  return { article, infobox, imgUrl };
 }
 
 function Contents({ markdown }: { markdown: string }) {
@@ -179,12 +151,81 @@ function Contents({ markdown }: { markdown: string }) {
   );
 }
 
-function createHashLink(header: string) {
-  return `#${header.toLowerCase().replace(/\s+/g, "-")}`;
+function Infobox({
+  infobox,
+  title,
+  imgUrl,
+}: {
+  infobox: { [key: string]: string };
+  title: string;
+  imgUrl: string | null;
+}) {
+  console.log(infobox);
+  return (
+    <div className="bg-gray-100 p-4 rounded-lg">
+      <h2 className="text-lg font-bold mb-2">{title}</h2>
+      {imgUrl && <img src={imgUrl} alt={title} className="mb-4 w-full" />}
+      <table className="text-xs border-spacing-4">
+        <tbody>
+          {Object.entries(infobox).map(
+            ([key, value]) =>
+              key !== "imageDescription" && (
+                <tr key={key}>
+                  <td className="font-bold p-1 min-w-24">{key}</td>
+                  <td className="p-1">
+                    <LinkOnlyRenderer
+                      markdown={linkify(
+                        Array.isArray(value) ? value.join(" • ") : value
+                      )}
+                    />
+                  </td>
+                </tr>
+              )
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-function getHeaderId(node: Element | undefined) {
-  return node?.children?.[0]?.type === "text"
-    ? createHashLink(String(node.children?.[0]?.value)).slice(1)
-    : "";
+async function fetchArticle(title: string, onChunk: (chunk: string) => void) {
+  try {
+    const response = await fetch("/api/genArticle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const articleStream = await response.body
+      ?.pipeThrough(new TextDecoderStream())
+      .getReader();
+    if (!articleStream) {
+      throw new Error("No article stream");
+    }
+    while (true) {
+      const { done, value } = await articleStream.read();
+      if (done) break;
+      onChunk(value);
+    }
+  } catch (error) {
+    console.error("Error fetching article:", error);
+    throw error;
+  }
 }
+
+const LoadingSkeleton = () => {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="h-10 bg-gray-300 rounded"></div>
+      <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+      <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+      <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+    </div>
+  );
+};
