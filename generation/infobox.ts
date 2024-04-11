@@ -24,7 +24,7 @@ export async function generateInfobox(
   return JSON.parse("{" + infobox);
 }
 
-const system = `You are an expert at writing infoboxes for wikipedia articles.  The user will give you an article and you will create the infobox for it.
+const system = `You are an expert at writing infoboxes for wikipedia articles.  The user will give you a summary of an article and you will create the infobox for it.
 
 Here is information on what the infobox should contain:
 An infobox on Wikipedia serves to succinctly summarize key information about the article’s subject, presenting crucial data in a structured and consistent format at the top right of a page. This tool enhances quick reference, offering a visually organized snapshot of important facts such as dates, characteristics, and relevant details, tailored to the subject type—be it a person, place, or event. Infoboxes also contribute to the aesthetic layout of the page, facilitate easier navigation by linking to related articles, and improve user engagement by streamlining access to essential information.
@@ -35,7 +35,7 @@ An infobox on Wikipedia serves to succinctly summarize key information about the
 - Return only the JSON object.
 - If you would like to link to another encyclopedia entry wrap the entry name in [[ ]]. Link liberally for anything that should be an encyclopedia entry. Example: [[Earth]]
 - If the info box shouldn't contain an image, don't include the imageDescription key.
-- Don't just summarize the article, add supplemental information to the infobox.
+- Don't just summarize the outline, add supplemental information to the infobox.
 
 The returned JSON must conform to this typescript type:
 

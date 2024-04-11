@@ -16,6 +16,8 @@ import {
 import MarkdownRenderer, {
   LinkOnlyRenderer,
 } from "@/components/MarkdownRenderer";
+import { decodeChunk } from "@/shared/encoding";
+import { throttle } from "throttle-debounce";
 
 export default function Article({
   title,
@@ -24,18 +26,13 @@ export default function Article({
   title: string;
   article: string | null;
 }) {
-  const response = useStreamingResponse(
-    title,
-    !article && !localCache.has(title)
-  );
+  const {
+    article: response,
+    infobox,
+    imgUrl,
+  } = useGeneratedArticle(title, !article && !localCache.has(title));
 
-  const { infobox, isLoading } = useInfobox(title, !!article);
-
-  console.log(infobox);
-
-  const thoughts = beforeArticleTag(article ?? response);
-
-  let markdown = article ? article : afterArticleTag(response);
+  let markdown = article ? article : afterArticleTag(response ?? "");
 
   markdown = markdown.trimStart();
 
@@ -65,7 +62,7 @@ export default function Article({
       <div className="col-span-9">
         {infobox && (
           <div className="float-right bg-white pl-4 pb-4 max-w-xs">
-            <Infobox infobox={infobox} title={title} />
+            <Infobox infobox={infobox} title={title} imgUrl={imgUrl} />
           </div>
         )}
         <MarkdownRenderer markdown={markdown} />
@@ -76,58 +73,40 @@ export default function Article({
 
 const localCache = new Map<string, string>();
 
-function useStreamingResponse(prompt: string, shouldStream: boolean) {
-  const { append, messages } = useChat();
-  const startedRef = useRef(!shouldStream);
-
-  const lastMessage = messages[messages.length - 1];
-
-  useEffect(() => {
-    if (!startedRef.current) {
-      append({ role: "user", content: prompt });
-    }
-
-    startedRef.current = true;
-  }, [prompt, append]);
-
-  useEffect(() => {
-    if (lastMessage?.role === "assistant") {
-      localCache.set(prompt, lastMessage.content);
-    }
-  }, [lastMessage, prompt]);
-
-  return lastMessage?.role === "assistant"
-    ? lastMessage.content
-    : localCache.get(prompt) ?? "";
-}
-
-function useInfobox(title: string, shouldFetch: boolean) {
+function useGeneratedArticle(title: string, shouldStream: boolean) {
+  const [article, setArticle] = useState<string | null>(null);
   const [infobox, setInfobox] = useState<{ [key: string]: string } | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
   const startedRef = useRef(false);
-
   useEffect(() => {
-    if (shouldFetch && !startedRef.current) {
-      startedRef.current = true;
-      setIsLoading(true);
-      fetch("/api/infobox", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setInfobox(data);
-          setIsLoading(false);
-        });
+    if (!shouldStream || startedRef.current) {
+      return;
     }
-  }, [shouldFetch, setInfobox, setIsLoading, title]);
-
-  return { infobox, isLoading };
+    startedRef.current = true;
+    let article = "";
+    const setArticleThrottled = throttle(100, setArticle);
+    const onChunk = (chunk: string) => {
+      const messages = decodeChunk(chunk);
+      for (const message of messages) {
+        switch (message.type) {
+          case "article-chunk":
+            article += message.value;
+            setArticleThrottled(article);
+            break;
+          case "info-box":
+            setInfobox(JSON.parse(message.value));
+            break;
+          case "image":
+            setImgUrl(message.value);
+            break;
+        }
+      }
+    };
+    fetchArticle(title, onChunk);
+  }, [title, shouldStream]);
+  return { article, infobox, imgUrl };
 }
 
 function Contents({ markdown }: { markdown: string }) {
@@ -169,22 +148,21 @@ function Contents({ markdown }: { markdown: string }) {
 function Infobox({
   infobox,
   title,
+  imgUrl,
 }: {
   infobox: { [key: string]: string };
   title: string;
+  imgUrl: string | null;
 }) {
   console.log(infobox);
   return (
     <div className="bg-gray-100 p-4 rounded-lg">
       <h2 className="text-lg font-bold mb-2">{title}</h2>
-      {infobox.imageUrl && (
-        <img src={infobox.imageUrl} alt={title} className="mb-4 w-full" />
-      )}
+      {imgUrl && <img src={imgUrl} alt={title} className="mb-4 w-full" />}
       <table className="text-xs border-spacing-4">
         <tbody>
           {Object.entries(infobox).map(
             ([key, value]) =>
-              key !== "imageUrl" &&
               key !== "imageDescription" && (
                 <tr key={key}>
                   <td className="font-bold p-1">{key}</td>
@@ -202,4 +180,35 @@ function Infobox({
       </table>
     </div>
   );
+}
+
+async function fetchArticle(title: string, onChunk: (chunk: string) => void) {
+  try {
+    const response = await fetch("/api/genArticle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const articleStream = await response.body
+      ?.pipeThrough(new TextDecoderStream())
+      .getReader();
+    if (!articleStream) {
+      throw new Error("No article stream");
+    }
+    while (true) {
+      const { done, value } = await articleStream.read();
+      if (done) break;
+      onChunk(value);
+    }
+  } catch (error) {
+    console.error("Error fetching article:", error);
+    throw error;
+  }
 }

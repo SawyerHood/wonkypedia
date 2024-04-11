@@ -22,7 +22,7 @@ export async function genAndUploadImage(prompt: string, key: string) {
   const blob = await genImageBlob(prompt);
   const { data: updateData, error } = await supabaseServiceClient.storage
     .from("images")
-    .update(`${key}.png`, blob);
+    .upload(`${key}.png`, blob);
   if (error) {
     console.error(error);
   }
