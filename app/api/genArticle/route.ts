@@ -76,7 +76,6 @@ export async function POST(req: Request) {
               /<summary>(.*?)<\/summary>/s
             );
             if (summaryContentMatch && summaryContentMatch[1]) {
-              const summaryContent = summaryContentMatch[1];
               infoBoxPromise = startInfoBox(summaryContentMatch[1]);
             }
           }
@@ -147,14 +146,12 @@ async function saveImageToDatabase(title: string, image: string) {
 }
 
 async function saveLinksToDatabase(title: string, links: string[]) {
-  const { error: linkError } = await supabaseServiceClient.from("links").upsert(
-    links.map((link) => ({ from: title, to: link })),
-    {
-      onConflict: "from, to",
-    }
-  );
+  links = Array.from(new Set(links));
+  const { error: linkError } = await supabaseServiceClient
+    .from("links")
+    .upsert(links.map((link) => ({ from: title, to: link })));
 
-  if (linkError) throw linkError;
+  if (linkError) console.error(linkError);
 }
 
 async function createArticleStream(title: string) {

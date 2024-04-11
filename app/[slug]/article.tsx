@@ -73,7 +73,14 @@ export default function Article({
   );
 }
 
-const localCache = new Map<string, string>();
+const localCache: Record<
+  string,
+  {
+    article?: string | null;
+    infobox?: { [key: string]: string } | null;
+    imgUrl?: string | null;
+  }
+> = {};
 
 function useGeneratedArticle(title: string, shouldStream: boolean) {
   const [article, setArticle] = useState<string | null>(null);
@@ -83,11 +90,24 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const startedRef = useRef(false);
   useEffect(() => {
-    if (!shouldStream || startedRef.current) {
+    if (!shouldStream || startedRef.current || localCache[title]) {
       return;
     }
+
     startedRef.current = true;
+
+    const updateCache = <T extends keyof (typeof localCache)[string]>(
+      key: T,
+      value: (typeof localCache)[string][T]
+    ) => {
+      if (!localCache[title]) {
+        localCache[title] = {};
+      }
+      localCache[title][key] = value;
+    };
+
     let article = "";
+
     const setArticleThrottled = throttle(100, setArticle);
     const onChunk = (chunk: string) => {
       const messages = decodeChunk(chunk);
@@ -95,13 +115,16 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
         switch (message.type) {
           case "article-chunk":
             article += message.value;
+            updateCache("article", article);
             setArticleThrottled(article);
             break;
           case "info-box":
             setInfobox(JSON.parse(message.value));
+            updateCache("infobox", JSON.parse(message.value));
             break;
           case "image":
             setImgUrl(message.value);
+            updateCache("imgUrl", message.value);
             break;
         }
       }
@@ -110,7 +133,11 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
       console.log(article);
     });
   }, [title, shouldStream]);
-  return { article, infobox, imgUrl };
+  return {
+    article: article ?? localCache[title]?.article,
+    infobox: infobox ?? localCache[title]?.infobox,
+    imgUrl: imgUrl ?? localCache[title]?.imgUrl,
+  };
 }
 
 function Contents({ markdown }: { markdown: string }) {
