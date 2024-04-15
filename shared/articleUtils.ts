@@ -55,6 +55,7 @@ export const extractArticle = (article: string) => {
 };
 
 export const linkify = (text: string) => {
+  if (typeof text !== "string") return "";
   return text.replace(
     /\[\[(.*?)(?:\|(.*?))?\]\]/g,
     (_, p1, p2) => `[${p2 || p1}](/${encodeURIComponent(p1)})`
