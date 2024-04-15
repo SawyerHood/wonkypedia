@@ -203,7 +203,11 @@ function Infobox({
   return (
     <div className="bg-gray-100 p-4 rounded-lg">
       <h2 className="text-lg font-bold mb-2">{title}</h2>
-      {imgUrl && <img src={imgUrl} alt={title} className="mb-4 w-full" />}
+      {imgUrl ? (
+        <img src={imgUrl} alt={title} className="mb-4 w-full" />
+      ) : (
+        <div className="animate-pulse bg-gray-300 w-full aspect-square mb-4"></div>
+      )}
       <table className="text-xs border-spacing-4">
         <tbody>
           {Object.entries(infobox).map(
