@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.20.1",
     "@next/third-parties": "^14.1.4",
     "@streamparser/json": "^0.0.20",
     "@supabase/ssr": "^0.3.0",

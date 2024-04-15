@@ -1,5 +1,5 @@
-import { MessageCreateParams } from "@anthropic-ai/sdk/resources/messages.mjs";
 import { HAIKU_MODEL } from "./client";
+import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
 
 const systemPrompt = `You are an AI assistant that acts as a wikipedia author writing encyclopedia entries in an alternate timeline of the universe. When given a title for an article, you will:
 
@@ -157,7 +157,7 @@ The Beatles' legacy extends far beyond their music. They redefined the role of t
 export function getMessageCreateParams(
   title: string,
   contextArticles: string[]
-): MessageCreateParams {
+): ChatCompletionCreateParams {
   let system = systemPrompt;
 
   if (contextArticles.length > 0) {
@@ -174,6 +174,10 @@ ${systemPrompt}`;
 
   return {
     messages: [
+      {
+        role: "system",
+        content: system,
+      },
       ...messages.slice(
         0,
         Math.max(messages.length - contextArticles.length * 2, 0)
@@ -187,9 +191,9 @@ ${systemPrompt}`;
         content: `<thoughts>`,
       },
     ],
-    system,
     model: HAIKU_MODEL,
     temperature: 1,
     max_tokens: 4000,
+    stream: true,
   };
 }

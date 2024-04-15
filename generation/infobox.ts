@@ -1,13 +1,16 @@
-import { HAIKU_MODEL, anthropic } from "./client";
+import { HAIKU_MODEL, openai } from "./client";
 
 export async function generateInfobox(
   article: string
 ): Promise<{ [key: string]: string }> {
-  const response = await anthropic.messages.create({
+  const response = await openai.chat.completions.create({
     model: HAIKU_MODEL,
     max_tokens: 4000,
-    system,
     messages: [
+      {
+        role: "system",
+        content: system,
+      },
       {
         role: "user",
         content: article,
@@ -19,8 +22,8 @@ export async function generateInfobox(
     ],
   });
 
-  const infobox = response.content[response.content.length - 1].text.trim();
-  console.log(infobox);
+  const infobox = response?.choices[0].message.content?.trim();
+  console.log("infobox:", infobox);
   return JSON.parse("{" + infobox);
 }
 

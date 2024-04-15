@@ -1,18 +1,19 @@
 import { supabaseServiceClient } from "@/db/service";
-import { anthropic } from "@/generation/client";
+import { openai } from "@/generation/client";
 import {
   collectAllLinksFromString,
   createMarkdown,
   extractArticle,
   slugify,
 } from "@/shared/articleUtils";
-import { AnthropicStream } from "ai";
+import { AnthropicStream, OpenAIStream } from "ai";
 import { revalidatePath } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { genAndUploadImage } from "@/generation/image";
 import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
 import { Json } from "@/db/schema";
+import { ChatCompletionCreateParamsStreaming } from "openai/resources/index.mjs";
 
 export const runtime = "edge";
 
@@ -70,6 +71,8 @@ export async function POST(req: Request) {
           }
 
           articleResult += value;
+
+          console.log("new value:", value);
 
           if (!infoBoxPromise) {
             const summaryContentMatch = articleResult.match(
@@ -186,10 +189,12 @@ async function createArticleStream(title: string) {
   console.log(params);
 
   // Ask Claude for a streaming chat completion given the prompt
-  const response = anthropic.messages.stream(params);
+  const response = await openai.chat.completions.create(
+    params as ChatCompletionCreateParamsStreaming
+  );
 
   // Convert the response into a friendly text-stream
-  const stream = AnthropicStream(response, {
+  const stream = OpenAIStream(response, {
     onCompletion: async (completion) => {
       await saveToDatabase(title, completion);
     },
