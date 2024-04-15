@@ -24,11 +24,12 @@ export default function Article({
   title: string;
   article: Database["public"]["Tables"]["articles"]["Row"] | null;
 }) {
+  const isGenerating = !article;
   const {
     article: streamedResponse,
     infobox: streamedInfoBox,
     imgUrl: streamedImgUrl,
-  } = useGeneratedArticle(title, !article);
+  } = useGeneratedArticle(title, isGenerating);
 
   const infobox = article?.infobox ?? streamedInfoBox;
   const imgUrl = article?.image_url ?? streamedImgUrl;
@@ -63,16 +64,27 @@ export default function Article({
         <Contents markdown={markdown} />
       </div>
       <div className="col-span-9">
-        {infobox && (
-          <div className="md:float-right md:max-w-xs md:pl-4 pb-4 max-w-full bg-white">
+        <div className="md:float-right md:max-w-xs md:pl-4 pb-4 max-w-full bg-white w-full">
+          {infobox ? (
             <Infobox
               infobox={infobox as any}
               title={title}
               imgUrl={imgUrl ?? null}
             />
-          </div>
+          ) : (
+            <div className="animate-pulse bg-gray-100 p-4 rounded-lg w-full h-80"></div>
+          )}
+        </div>
+        {isGenerating &&
+        markdown.split("\n").filter((l) => Boolean(l.trim())).length < 2 ? (
+          <>
+            <LoadingSkeleton />
+            <LoadingSkeleton />
+            <LoadingSkeleton />
+          </>
+        ) : (
+          <MarkdownRenderer markdown={markdown} />
         )}
-        <MarkdownRenderer markdown={markdown} />
       </div>
     </div>
   );
@@ -248,8 +260,8 @@ async function fetchArticle(title: string, onChunk: (chunk: string) => void) {
 
 const LoadingSkeleton = () => {
   return (
-    <div className="animate-pulse space-y-4">
-      <div className="h-10 bg-gray-300 rounded"></div>
+    <div className="animate-pulse space-y-4 mb-4 md:w-4/6 md:pr-4">
+      <div className="h-6 bg-gray-300 rounded"></div>
       <div className="h-6 bg-gray-300 rounded w-5/6"></div>
       <div className="h-6 bg-gray-300 rounded w-5/6"></div>
       <div className="h-6 bg-gray-300 rounded w-5/6"></div>
