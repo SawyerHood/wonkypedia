@@ -5,11 +5,11 @@ export const toTitleCase = (str: string) => {
 };
 
 export const titleToUri = (title: string) => {
-  return encodeURI(toTitleCase(title));
+  return encodeURIComponent(toTitleCase(title));
 };
 
 export const uriToTitle = (uri: string) => {
-  return toTitleCase(decodeURI(uri)).trim();
+  return toTitleCase(decodeURIComponent(uri)).trim();
 };
 
 export const createMarkdown = ({
