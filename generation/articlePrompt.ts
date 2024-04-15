@@ -1,7 +1,8 @@
-import { HAIKU_MODEL } from "./client";
+import { trim } from "@/shared/strings";
+import { CHEAP_MODEL } from "./client";
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
 
-const systemPrompt = `You are an AI assistant that acts as a wikipedia author writing encyclopedia entries in an alternate timeline of the universe. When given a title for an article, you will:
+const systemPrompt = `You are an AI assistant that acts as a wikipedia author writing encyclopedia entries in an alternate timeline of the universe. When given a title for an entry, you will:
 
 1. Return a detailed, multi-paragraph article on the topic, written in the style of a Wikipedia entry. Use an encyclopedic, dry, factual tone.
 2. Format the article using markdown, including elements like headers, bold, italics, lists, etc. as appropriate. The title should already be included as a top-level header.
@@ -15,142 +16,245 @@ const systemPrompt = `You are an AI assistant that acts as a wikipedia author wr
 Remember, a topic qualifies for an encyclopedia article if it has lasting significance, broad appeal, and can be covered factually based on reliable sources. Appropriate topics include major historical events, notable people, scientific/cultural/artistic subjects, and significant works like influential books, films, games, etc. Avoid niche or promotional topics.`;
 
 const messages = [
-  { role: "user", content: `Quantum Computing` },
+  { role: "user", content: `New York City` },
   {
     role: "assistant",
-    content: `<thoughts>
-In this alternate timeline, quantum computing has advanced much more rapidly, becoming widely adopted in the 2030s. Key points:
-1. Early development and breakthroughs
-2. Key players and companies
-3. Applications in cryptography, drug discovery, and optimization
-4. Societal impact and ethical concerns
-5. Future prospects and challenges
-</thoughts>
-
-<summary>
-Quantum computing, a revolutionary technology harnessing the principles of quantum mechanics, has transformed various industries and reshaped society in the early 21st century. With its ability to solve complex problems exponentially faster than classical computers, quantum computing has led to breakthroughs in cryptography, drug discovery, and optimization, while also raising ethical concerns about its potential misuse.
-</summary>
-
-<article>
-# Quantum Computing
-[[Quantum computing]] is a groundbreaking technology that leverages the principles of [[quantum mechanics]] to perform complex computations. Unlike [[classical computers]], which rely on [[bits]] that can be either 0 or 1, quantum computers use [[quantum bits]], or [[qubits]], which can exist in multiple states simultaneously. This property, known as [[superposition]], allows quantum computers to solve certain problems exponentially faster than their classical counterparts.
-## Early Development and Breakthroughs
-The concept of quantum computing was first proposed in the 1980s by physicist [[Richard Feynman]] and later formalized by [[David Deutsch]] in 1985. However, it wasn't until the early 2000s that significant breakthroughs were made in the practical implementation of quantum computers. In 2023, a team of researchers from the [[University of Sydney]] successfully demonstrated a 100-qubit quantum computer, marking a major milestone in the field.
-## Key Players and Companies
-Several tech giants and startups have invested heavily in the development of quantum computing, recognizing its immense potential. Some of the key players include:
-1. [[Google]], which achieved [[quantum supremacy]] in 2029 with its 1,000-qubit processor.
-2. [[IBM]], a pioneer in quantum computing, offering cloud-based access to its quantum systems.
-3. [[Microsoft]], focusing on the development of [[topological qubits]] for increased stability.
-4. [[D-Wave Systems]], a Canadian company specializing in [[quantum annealing]] processors.
-## Applications and Impact
-Quantum computing has found applications in various domains, revolutionizing fields such as:
-1. [[Cryptography]]: Quantum computers can break many of the current [[encryption]] methods, prompting the development of [[quantum-resistant cryptographic algorithms]].
-2. [[Drug Discovery]]: By simulating complex [[molecular interactions]], quantum computers have accelerated the discovery of new drugs and materials.
-3. [[Optimization]]: Quantum algorithms can solve optimization problems, such as [[route planning]] and [[portfolio optimization]], much faster than classical methods.
-## Societal Impact and Ethical Concerns
-The widespread adoption of quantum computing has raised concerns about its potential misuse. The ability to break current encryption methods has led to fears of increased [[cyber threats]] and the need for quantum-resistant security measures. Additionally, the concentration of quantum computing power in the hands of a few large corporations has sparked debates about the [[equitable access]] to this transformative technology.
-## Future Prospects and Challenges
-As quantum computing continues to advance, researchers are working on developing more stable and scalable quantum systems. The ultimate goal is to achieve [[fault-tolerant quantum computing]], which would enable the construction of large-scale quantum computers capable of tackling even more complex problems. However, challenges such as [[qubit decoherence]] and the need for [[error correction]] remain significant hurdles to overcome.
-Despite these challenges, the future of quantum computing looks promising. As the technology matures, it is expected to have a profound impact on various aspects of society, from scientific research and healthcare to finance and beyond, ushering in a new era of computational possibilities.
-</article>`,
+    content: trim`<thoughts>
+    In this alternate timeline, New York City:
+    - Was originally settled by the Dutch as New Rotterdam 
+    - Remained a Dutch colony and never came under British rule
+    - Grew to become the capital of an independent Dutch-speaking nation called New Netherland
+    - Is a global hub of commerce and culture but retains a distinct Dutch character
+    
+    Outline:
+    1. History
+    - Dutch settlement as New Rotterdam 
+    - Growth as capital of Dutch New Netherland colony
+    - Independence from the Netherlands
+    2. Geography
+    - Location and layout of the city
+    - Boroughs and neighborhoods
+    3. Demographics
+    - Population and diversity
+    - Languages and religion 
+    4. Economy
+    - Key industries and companies
+    - Role as a global financial center
+    5. Culture
+    - Dutch influences 
+    - Arts, music, museums, cuisine
+    - Landmarks and tourist attractions
+    6. Transportation
+    - Extensive canal and rail system
+    - Airports and ports
+    </thoughts>
+    
+    <summary>
+    New Rotterdam, widely known as New York City, is the most populous city in New Netherland and a global hub of commerce, finance, and culture. Originally settled by Dutch colonists in the 17th century, it has grown into a diverse metropolis of over 8 million residents. While a melting pot of cultures from around the world, the city retains a distinctly Dutch character, from its canal-lined streets to its architecture and cuisine. As the capital of the Dutch-speaking nation of New Netherland, New Rotterdam is a center of government as well as the headquarters of numerous major corporations and financial institutions.
+    </summary>
+    
+    <article>
+    # New York City
+    
+    New Rotterdam, often referred to as New York City or simply New York, is the most populous city in [[New Netherland]] and one of the most populous in the world, with an estimated population of 8.4 million people as of 2020. Located in the state of [[New Holland]] at the mouth of the [[Hudson River]], the city is a global hub of commerce, finance, media, art, fashion, technology, education, and entertainment. It is the capital of New Netherland and is composed of five boroughs: [[Manhattan]], [[Brooklyn]], [[Queens]], [[The Bronx]], and [[Staten Island]].
+    
+    ## History
+    
+    New Rotterdam was founded as a Dutch settlement and trading post in 1624 by colonists sponsored by the [[Dutch West India Company]]. The settlement, located on the southern tip of [[Manhattan]] island, was named New Rotterdam after the major Dutch port city. It quickly grew in importance as a hub for the [[Dutch fur trade]].
+    
+    Despite periodic conflicts with the [[Lenape]] Native Americans and rival [[European powers]], the colony continued to thrive under Dutch rule throughout the 17th and 18th centuries. It served as the capital of the Dutch province of [[New Netherland]], which encompassed much of the Mid-Atlantic region of [[North America]].
+    
+    As the influence and ambitions of New Netherland grew, so did tensions with the [[Netherlands|motherland]]. In 1796, the colony formally declared independence and established itself as a sovereign Dutch-speaking nation, with New Rotterdam as its capital. The city continued to grow rapidly during the 19th century, bolstered by [[immigration]] and the construction of critical infrastructure like the [[Erie Canal]].
+    
+    ## Geography
+    
+    New Rotterdam is situated on one of the world's largest [[natural harbors]], at the mouth of the Hudson River which feeds into [[New York Bay]] and then the [[Atlantic Ocean]]. The city is built primarily on three islands: Manhattan, Staten Island, and western [[Long Island]] (including Brooklyn and Queens).
+    
+    The city's land has been extensively altered by [[land reclamation]] along the waterfronts and the iconic criss-crossing [[canals]] in [[Lower Manhattan|Lower]] and [[Midtown Manhattan]]. The terrain is relatively flat and low-lying, with the highest natural point being [[Todt Hill]] on Staten Island at 409 ft (124.5 m).
+    
+    ## Demographics
+    
+    New Rotterdam is the most populous city in New Netherland, with an estimated 2020 population of 8,336,817 distributed over 302.6 square miles (784 km2). It is also one of the most densely populated major cities in the world. 
+    
+    The city is exceptionally diverse, with a large [[foreign-born population]]. The [[Amsterdam Metro Area]] is home to the largest ethnically Dutch population outside of the Netherlands, as well as major populations with roots all around the globe. Approximately 40% of the city's residents speak [[Dutch language|Dutch]] at home, while sizable populations speak [[English language|English]], [[Spanish language|Spanish]], [[Chinese language|Chinese]], and various other languages.
+    
+    ## Economy
+    
+    New Rotterdam is a global hub of international business and commerce and is one of three "command centers" for the [[world economy]] (along with [[London]] and [[Tokyo]]). The city is a major center for [[finance]], [[insurance]], [[real estate]], [[media]] and the [[arts]] in New Netherland and the world.
+    
+    Many major [[corporations]] are headquartered in New Rotterdam, including numerous [[Fortune 500]] companies. The city's [[Port of New Rotterdam]] is also a major economic engine, handling record cargo volume for the North American [[container port]]. [[Manufacturing]] accounts for a significant but declining share of employment.
+    
+    ## Culture
+    
+    New Rotterdam has been described as the cultural, financial, and media capital of the world. It is home to many world-class [[museums]], [[art galleries]], [[libraries]], and [[theaters]]. Performing arts in the city are anchored by the iconic Dutch-language theaters along [[Broadway (theater)|Broadway]] as well as world-renowned performance venues like the [[Metropolitan Opera]].
+    
+    The city's 39 [[Dutch Reformed church]] structures are some of the oldest in the nation. Other iconic landmarks include the [[Statue of Friendship]], a gift from [[Napoleonic France]], and the [[Empire State Building]]. The city is also famous for its Dutch-inspired [[cuisine]], including [[stroopwafel]]s, [[bitterballen]], and street-side [[herring]] stands, alongside its [[pizza]] and [[bagel]]s.
+    
+    ## Transportation
+    
+    New Rotterdam's extensive [[transportation]] system includes one of the largest [[subway]] systems worldwide; an extensive network of canals for both transportation and [[water management]]; numerous [[taxis]], [[ferries]], and [[buses]]; and [[bicycle paths]] throughout the city. Numerous [[rail lines]] and [[highways]] connect the city with the surrounding region.
+    
+    The city is served by three major [[airports]] ([[John F. Kennedy International Airport|JFK]], [[LaGuardia Airport|LaGuardia]], and [[Newark Liberty International Airport|Newark Liberty]]) as well as major rail hubs at [[New Rotterdam Central Station]] and [[Pennsylvania Station (New York City)|Pennsylvania Station]]. Its location at the mouth of the Hudson River allows deep water access for the city's extensive ferry system and [[freight]] shipping to its [[port]] facilities.
+    </article>`,
   },
-  { role: "user", content: `Genghis Khan` },
+  { role: "user", content: `The Industrial Revolution` },
   {
     role: "assistant",
-    content: `<thoughts>
-In this alternate timeline, Genghis Khan's empire never fragmented and continued to expand, eventually uniting most of the known world under Mongol rule. Key points:
-1. Early life and rise to power
-2. Unification of the Mongol tribes
-3. Expansion of the Mongol Empire
-4. Pax Mongolica and cultural exchange
-5. Legacy and impact on world history
-</thoughts>
-
-<summary>
-Genghis Khan, the founder of the Mongol Empire, is remembered as one of the greatest conquerors in history. His empire never fragmented and continued to expand, eventually uniting most of the known world under Mongol rule. The resulting Pax Mongolica facilitated unprecedented cultural exchange and shaped the course of world history.
-</summary>
-
-<article>
-# [[Genghis Khan]]
-Genghis Khan (c. 1162 – 1227), born [[Temüjin]], was the founder and first [[Great Khan]] of the [[Mongol Empire]], which became the largest contiguous empire in history. He is renowned for his [[military genius]], [[political acumen]], and the enduring legacy of his conquests.
-## Early Life and Rise to Power
-Temüjin was born into a noble family in the [[Mongol confederation]]. After his father's death, he faced numerous challenges, including [[slavery]] and rivalry from other [[clans]]. Through his [[charisma]], strategic [[alliances]], and military prowess, Temüjin gradually united the nomadic tribes of [[Northeast Asia]], adopting the title "Genghis Khan" (meaning "universal ruler") in 1206.
-## Unification of the Mongol Tribes
-Genghis Khan's unification of the Mongol tribes was a turning point in history. By ending the constant infighting and uniting the nomads under a single banner, he created a formidable [[military force]] that would go on to conquer vast territories. The [[Mongol army]], known for its [[discipline]], [[mobility]], and innovative [[tactics]], became the most feared military power of its time.
-## Expansion of the Mongol Empire
-Under Genghis Khan's leadership, the Mongol Empire expanded rapidly, conquering [[Central Asia]], [[China]], [[Persia]], and parts of [[Eastern Europe]]. His successors continued his legacy, further extending the empire's reach. By the late 13th century, the Mongol Empire encompassed most of [[Eurasia]], from [[Korea]] to [[Hungary]] and from [[Russia]] to the [[Persian Gulf]].
-## [[Pax Mongolica]] and Cultural Exchange
-The Mongol conquest ushered in an era of relative peace and stability known as Pax Mongolica. The empire's vast network of trade routes, later known as the [[Silk Road]], facilitated unprecedented [[cultural exchange]]. Ideas, [[technologies]], and goods flowed freely across the empire, leading to significant advancements in fields such as [[science]], [[art]], and [[commerce]].
-## Legacy and Impact on World History
-Genghis Khan's legacy extends far beyond his military conquests. The Mongol Empire's political, economic, and cultural influence shaped the course of [[world history]]. The empire's [[administrative system]], which included a [[meritocratic]] [[bureaucracy]] and [[religious tolerance]], served as a model for future [[states]]. The cultural exchange fostered by the Pax Mongolica laid the foundation for the [[Renaissance]] and the [[Age of Exploration]].
-Today, Genghis Khan is remembered as one of the most influential figures in history, a visionary leader whose empire united much of the known world and left an indelible mark on the course of human civilization.
-</article>`,
-  },
-  { role: "user", content: `World War II` },
-  {
-    role: "assistant",
-    content: `<thoughts>
-In this alternate timeline, World War II ended with a negotiated peace in 1943, leading to a very different post-war world. Key points:
-1. Causes and early years of the war
-2. Turning points and major battles
-3. Peace negotiations and the Treaty of Geneva
-4. Post-war division of power and spheres of influence
-5. Long-term consequences and the Cold War
-</thoughts>
-
-<summary>
-World War II, the global conflict that lasted from 1939 to 1943, reshaped the political, economic, and social landscape of the 20th century. The war ended with a negotiated peace in 1943, leading to a post-war world characterized by a multipolar balance of power and a prolonged Cold War between the United States, Germany, and the Soviet Union.
-</summary>
-
-<article>
-# World War II
-World War II was a global conflict that lasted from 1939 to 1943, involving most of the world's nations and resulting in the deaths of over 60 million people. The war began with [[Nazi Germany]]'s invasion of [[Poland]] in September 1939 and ended with a negotiated peace in 1943, following a series of decisive battles and diplomatic maneuvers.
-## Causes and Early Years of the War
-The roots of World War II can be traced back to the aftermath of [[World War I]] and the rise of [[fascism|fascist]] regimes in Europe, particularly Nazi Germany under [[Adolf Hitler]]. The war began with Germany's invasion of Poland, followed by the fall of [[France]] and the [[Low Countries]] in 1940. The conflict soon escalated, with the entry of [[Italy]] and [[Japan]] on the side of the [[Axis powers]] and the [[United States]] and the [[Soviet Union]] joining the [[Allies]].
-## Turning Points and Major Battles
-The war saw several turning points and major battles that shaped its outcome. The [[Battle of Britain]] in 1940 marked the first major defeat of the German [[Luftwaffe]], while the German invasion of the Soviet Union in 1941 opened up a vast new front in the east. In the Pacific, the Japanese attack on [[Pearl Harbor]] in December 1941 brought the United States into the war, leading to a series of naval battles, including the decisive [[Battle of Midway]] in 1942.
-## Peace Negotiations and the Treaty of Geneva
-By 1943, both sides were exhausted and facing mounting casualties. Secret peace negotiations began in neutral [[Switzerland]], culminating in the Treaty of Geneva in November 1943. The treaty established a new balance of power in Europe and Asia, with Germany retaining control over much of [[Western Europe]], while the Soviet Union expanded its influence in [[Eastern Europe]] and the [[Balkans]]. In the Pacific, Japan withdrew from its conquered territories, with the United States establishing a strong presence in the region.
-## Post-War Division of Power and Spheres of Influence
-The post-war world was characterized by a multipolar balance of power, with the United States, Germany, and the Soviet Union emerging as the dominant global powers. Each of these nations established its own [[sphere of influence]], leading to a tense and often volatile international order. The United States focused on the [[Western Hemisphere]] and the Pacific, while Germany dominated Western Europe and parts of [[Africa]]. The Soviet Union, meanwhile, expanded its control over Eastern Europe and [[Central Asia]].
-## Long-Term Consequences and the Cold War
-The long-term consequences of World War II and the Treaty of Geneva were profound. The war accelerated the decline of [[European colonialism|European colonial empires]], leading to the emergence of new independent nations in Asia and Africa. The division of power between the United States, Germany, and the Soviet Union set the stage for a prolonged [[Cold War]], characterized by ideological rivalry, [[proxy war|proxy conflicts]], and a [[nuclear arms race]].
-The Cold War shaped global politics for decades, influencing everything from culture and technology to economics and social movements. It was not until the late 20th century, with the collapse of the Soviet Union and the reunification of Germany, that the post-war order established by the Treaty of Geneva began to unravel, ushering in a new era of [[globalization]] and international cooperation.
-</article>`,
+    content: trim`<thoughts>
+    In this alternate timeline, the Industrial Revolution:
+    - Began earlier, in the mid-1600s rather than late 1700s
+    - Started in France rather than Britain 
+    - Was driven more by advances in chemistry and materials rather than mechanics and steam power
+    - Had a bigger impact on agriculture and food production early on
+    - Caused major political upheaval and reorganization of society
+    - Led to the rise of new colonial powers and trade empires
+    
+    Outline:
+    1. Origins in France in 1600s
+    2. Key inventions and technologies 
+    3. Spread to other countries
+    4. Impact on economy and society
+    5. Political revolutions and new governments
+    6. Changes to global trade and colonialism
+    7. Legacy and long-term effects
+    </thoughts>
+    
+    <summary>
+    The Industrial Revolution was a period of rapid technological advancement and socioeconomic change that began in France in the mid-17th century. Driven by innovations in agriculture, manufacturing, and chemistry, industrialization reshaped societies, economies and politics across Europe and eventually the world. The Revolution enabled the rise of new colonial trade empires, displaced traditional artisan and peasant classes, and helped spur political revolutions that ushered in new forms of government. Its impacts still echo through the modern world.
+    </summary>
+    
+    <article>
+    # The Industrial Revolution
+    
+    The Industrial Revolution was a period of profound technological, socioeconomic, and cultural transformation that originated in [[France]] during the mid-17th century before spreading to the rest of [[Europe]], the [[Americas]], and eventually the world during the 18th and early 19th centuries. Characterized by a shift from predominantly agrarian societies based on manual labor to industrialized, urban economies powered by fossil fuels and manufacturing, the Revolution laid the foundations of the modern world.
+    
+    ## Origins in France
+    
+    Historians generally place the start of the Industrial Revolution in 1650s France, when a series of critical innovations in agriculture and chemistry jumpstarted French industry and commerce. The key early drivers were:
+    
+    - The widespread adoption of [[crop rotation]], [[selective breeding]], and [[fertilizers]] in French agriculture, which significantly increased crop yields and food production. This reduced the need for farm labor and enabled migration to cities.
+    
+    - The invention of new [[dyes]], [[ceramics]] and [[construction materials]] powered by advances in inorganic chemistry and material science. These valuable products formed the basis for France's early manufacturing boom.
+    
+    - [[Financial innovations]] like joint-stock companies and a central bank to stabilize currency facilitated the growth of commerce and investment in industrial enterprises.
+    
+    By 1700, France was the most industrialized country in Europe, with major manufacturing centers springing up first in [[Paris]], [[Lyon]], and [[Marseille]], then spreading to other cities. Wealth from manufacturing and trade powered the [[French Colonial Empire]] to become the world's largest by 1750.
+    
+    ## The Revolution Spreads
+    
+    Seeing the explosive growth of the French economy, other European powers rushed to industrialize in the early 18th century, often by importing French technology and expertise. [[Flanders]] and the [[Dutch Republic]] were early adopters, followed by [[England]], [[Prussia]], the [[Italian States]], and others by 1750. 
+    
+    The Revolution then jumped to [[European colonies]], first the [[American Colonies]], then the [[West Indies]], [[Brazil]], and [[New Spain]] by the 1770s. With raw materials from the colonies and markets for finished goods, the European powers further expanded their manufacturing and trade.
+    
+    Key inventions that enabled industrialization to spread included:
+    - The [[Spinning Jenny]] and other textile equipment in Flanders 
+    - [[Machine tools]] and [[interchangeable parts]] in England
+    - The [[Cotton gin]] in the American Colonies
+    - [[Coal power]] in Prussia and England
+    - The [[Battery]] and [[Electrochemistry]] in Italy
+    
+    ## Impacts on Economy and Society
+    
+    The Industrial Revolution completely reshaped economic and social structures, especially in Western Europe and North America. Some of the most notable effects were:
+    
+    - Rapid [[urbanization]] as rural workers migrated to factory cities for jobs, causing overcrowding and poor living conditions but also enabling new cultural and intellectual movements.
+    
+    - The growth of new [[social classes]], particularly an urban working class/[[proletariat]] and a [[middle class]] of professionals, merchants and small business owners. This displaced many traditional artisans and guilds.
+    
+    - Increased life expectancy and population growth due to improved food supply and sanitation, although offset by disease in crowded cities. This population growth enabled the spread of colonialism.
+    
+    - The concentration of [[capital]] in the hands of industrial business owners, bankers and shareholders, leading to both massive increases in wealth and inequality. 
+    
+    - The emergence of classical [[liberal economics]], particularly ideas of [[free markets]], [[private enterprise]], and [[free trade]] between nations. These became the dominant economic philosophies, especially in the [[Anglosphere]].
+    
+    ## Political Revolutions 
+    
+    The economic and social dislocations (as well as new prosperity) of the Industrial Revolution helped drive a wave of political revolutions, first in Western Europe and its colonies, that then spread globally. Most sought to constrain the power of monarchies and aristocracies and empower the new industrial and professional classes.
+    
+    Famous political upheavals during the Age of Revolution included:
+    
+    - The [[Flemish Revolution]] of 1717 that overthrew [[Spanish rule]] and established a republic. 
+    - The [[American Revolution]] starting in 1765 that established the first [[United States]].
+    - The [[French Constitutional Revolution]] of 1777 that transformed France into a [[constitutional monarchy]].
+    - The [[Colombian Revolution]] of 1788 that brought independence to [[New Granada]].
+    - The [[Italian Unification]] wars of the 1790s that created a unified [[Italy]].
+    - The [[United Kingdom|British Democratic Revolution]] of 1801 that ended aristocratic rule in [[Great Britain]].
+    
+    Industrialized weapons like [[rifles]], [[artillery]] and [[warships]] played a key role in these revolutions. So did new mass media like [[newspapers]] printed with [[steam presses]] that spread revolutionary ideas.
+    
+    ## Global Trade and Colonialism
+    
+    The Industrial Revolution went hand in hand with colonialism and the rise of global trade empires in the 18th and 19th centuries. Driven by the need for raw materials to feed their factories and foreign markets for finished goods, the industrialized powers dramatically expanded their colonial realms in this period.
+    
+    France remained the world's leading colonial power throughout the 18th century, conquering [[Louisiana]], [[Haiti]], and parts of [[India]]. However, after the revolution of 1777, France largely turned inward. In the 19th century, the [[United Kingdom of Great Britain]] emerged as the leading colonial empire, seizing territory in India, [[China]], [[Southeast Asia]], [[Australia]], and [[Africa]]. 
+    
+    Other colonial powers of the industrial age included:
+    - The [[Netherlands]], with colonies in the [[East Indies]], [[Taiwan]], [[Ceylon]], [[South Africa]] 
+    - The [[United States of America]], which colonized the [[American West]], [[Liberia]], [[Hawaii]], and the [[Philippines]]
+    - [[Italy]] with colonies in [[Libya]], [[Somalia]], and [[Albania]]
+    - [[Russia]], which colonized [[Siberia]], [[Central Asia]], and [[Alaska]]
+    
+    The industrial powers also established the first [[free trade agreements]] and international financial institutions like the [[Bank of England]] to facilitate global commerce. This economic integration came at a high cost for colonized peoples, however, who experienced famine, exploitation, cultural destruction and genocide.
+    
+    ## Legacy
+    
+    The Industrial Revolution was one of the most transformative events in human history, on par with the [[Agricultural Revolution]] and the rise of the first [[civilizations]]. In just a few generations, it utterly reshaped the trajectories of global economics, politics, technology and culture.
+    
+    Innovations like [[mass production]], [[interchangeable parts]], [[electricity]], and [[telecommunications]] continued to transform the world well into the 20th century. The Revolution birthed modern [[capitalism]], [[liberalism]], [[colonialism]], and [[globalization]], as well as counter-movements like [[socialism]], [[communism]], [[feminism]], and [[environmentalism]].
+    
+    Perhaps most significantly, the burning of [[fossil fuels]] to power industry and agriculture enabled rapid [[population growth]] and laid the foundation of modern [[consumer culture]]. Yet it also unleashed [[climate change]] and [[environmental degradation]] that still threaten humanity today. Reconciling the material prosperity enabled by industry with its impact on the earth remains an ongoing challenge.
+    </article>`,
   },
   { role: "user", content: `The Beatles` },
   {
     role: "assistant",
-    content: `<thoughts>
-In this alternate timeline, The Beatles never broke up and continued to make music together well into the 21st century. Key points:
+    content: trim`<thoughts>
+    In this alternate timeline, The Beatles had a different lineup and history from our reality:
+    - John Lennon was the only consistent member throughout their career 
+    - The band had a rotating cast of other musicians, including Eric Clapton for a period
+    - They were less commercially successful but were a highly influential avant-garde rock band
+    - The band embraced electronica and proto-punk in the early 70s
+    - Lennon was shot and killed on stage in 1977, abruptly ending the band
+    
+    Outline:
+    1. Formation and early years 
+    2. Peak of popularity in late 60s
+    3. Avant-garde and electronic shift in early 70s
+    4. Lennon's murder and end of the band
+    5. Legacy and influence
+    </thoughts>
+    
+    <summary>
+    The Beatles were an English rock band formed in 1960, featuring John Lennon as the primary creative force alongside a frequently changing lineup of musicians. While they found modest chart success in the mid-1960s, the group became known for their increasingly avant-garde musical style in the early 1970s which blended psychedelic rock, electronic experimentation, and aggressive proto-punk. The Beatles' career was cut short when Lennon was shot dead on stage in 1977, but they remain one of the most influential if divisive rock acts of the 20th century.
+    </summary>
+    
+    <article>
+    # The Beatles
 
-1. Formation and early success
-2. Musical evolution and experimentation
-3. Continued collaboration and solo projects
-4. Social and political activism
-5. Legacy and impact on popular culture
-
-</thoughts>
-
-<summary>
-The Beatles, the most influential and commercially successful band in history, never broke up in this alternate timeline. Instead, they continued to make music together for decades, evolving their sound and pushing the boundaries of popular music. Their enduring collaboration, combined with their individual solo projects and social activism, cemented their status as cultural icons and left an indelible mark on the world.
-</summary>
-
-<article>
-# The [[The Beatles|Beatles]]
-The Beatles, comprised of [[John Lennon]], [[Paul McCartney]], [[George Harrison]], and [[Ringo Starr]], are the most iconic and influential band in the history of [[popular music]]. Formed in [[Liverpool]], [[England]], in 1960, the group went on to revolutionize the [[music industry]] and shape the course of popular culture for generations.
-## Formation and Early Success
-The Beatles began their career playing in clubs in Liverpool and [[Hamburg]], [[Germany]], honing their skills and developing their distinctive sound. Their breakthrough came in 1963 with the release of their first album, "[[Please Please Me (album)|Please Please Me]]," which topped the charts in the [[United Kingdom]] and marked the beginning of "[[Beatlemania]]."
-## Musical Evolution and Experimentation
-Throughout their career, The Beatles constantly evolved their musical style, incorporating elements of [[rock and roll]], [[pop music|pop]], [[psychedelia]], and [[avant-garde]] experimentation. Albums such as "[[Rubber Soul]]," "[[Revolver (album)|Revolver]]," and "[[Sgt. Pepper's Lonely Hearts Club Band]]" showcased their innovative songwriting, studio techniques, and willingness to push the boundaries of popular music.
-## Continued Collaboration and Solo Projects
-The band continued to work together for decades. While pursuing successful solo projects, the members regularly collaborated on Beatles albums, maintaining their creative partnership and exploring new musical territory. Notable later albums include "[[Imagine Together]]" (1975), "Everest" (1982), and "[[The Beatles Anthology|Anthology]]" (1995).
-## Social and Political Activism
-The Beatles were not only musical innovators but also influential social and political activists. They used their platform to advocate for causes such as [[peace movement|peace]], [[civil rights movement|civil rights]], and [[environmentalism]]. John Lennon, in particular, became a prominent voice in the [[opposition to the Vietnam War|anti-war movement]], while George Harrison's embrace of [[Eastern philosophy]] and [[spirituality]] inspired a generation of seekers.
-## Legacy and Impact on Popular Culture
-The Beatles' impact on [[popular culture]] is immeasurable. Their music, [[1960s in fashion|fashion]], and attitudes shaped the [[counterculture of the 1960s]] and continue to influence artists and fans around the world. The band's enduring success and cultural relevance in this alternate timeline underscore their status as the most significant and beloved musical act of all time.
-The Beatles' legacy extends far beyond their music. They redefined the role of the artist in society, paving the way for greater creative freedom and social consciousness in popular entertainment. Their continued presence and evolution in this alternate history serve as a testament to the timeless appeal of their music and the enduring power of their message of love, peace, and unity.
-</article>`,
+    The Beatles were an English [[rock music|rock]] band formed in [[Liverpool]] in 1960. The group, whose best-known line-up comprised [[John Lennon]], [[Eric Clapton]], [[Klaus Voormann]], and [[Alan White (drummer)|Alan White]], are regarded as the most influential band of all time. They were integral to the development of [[1960s counterculture]] and popular music's recognition as an [[art form]]. Rooted in [[skiffle]], [[beat music|beat]] and 1950s [[rock and roll]], their sound incorporated elements of [[classical music|classical]], [[traditional pop music|traditional pop]], and [[electronic music|electronic experimentation]].
+    
+    ## Formation and early years
+    The Beatles began in 1960 as a skiffle and rock and roll group led by John Lennon and featuring a number of schoolmates. The band cycled through drummers and bassists for several years while playing frequently in the [[pub]]s and [[nightclub]]s of Liverpool and [[Hamburg]]. They settled on the lineup of Lennon, guitarist Eric Clapton, bassist Klaus Voormann, and drummer Alan White in early 1964. 
+    
+    Signed to [[Parlophone Records]] by mid-1964, the band quickly gained popularity in the [[United Kingdom|UK]] with a string of catchy singles blending rock and pop sounds like "Love to Hold Your Mind", "With a Little Luck", and "Hey Go Round." Lennon and Clapton became known for their inventive [[guitar]] interplay and [[songwriting]] partnership.
+    
+    ## Peak of popularity  
+    In the latter half of the 1960s, The Beatles released a string of groundbreaking albums that expanded the scope of rock music: 1966's ''Kaleidoscope Eyes'', 1967's ''Beyond the Horizon'', and 1968's [[The Beatles (album)|self-titled album]] (commonly known as the "Black Album" due to its cover art). These records featured complex songwriting, unorthodox structures, philosophical lyrics, and elements of [[psychedelic rock]], [[Indian classical music]], and [[electroacoustic music]]. Hits from this period like "A Better View", "Your Inside World", and "Not Too Far" showcased the band's evolution.
+    
+    The Beatles' fame hit a fever pitch in 1967–1968. They were regarded as leaders of the nascent counterculture's "New Awakening," and their music was seen as revolutionary. Lennon in particular became an icon for the [[hippie]] movement and [[student activism|student activists]]. However, the band began to retreat from the intensity of [[Beatlemania]] and stopped touring, focusing on increasingly experimental studio recordings.
+    
+    ## Avant-garde period
+    As they entered the 1970s, The Beatles began a dramatic musical shift, growing heavily influenced by the emerging [[krautrock]] and electronic music scenes as well as the aggressive rock of artists like [[Iggy Pop]]. Their untitled 1971 double album (dubbed "The Primal Record" by fans) featured side-long [[tape manipulation]]s, discordant [[noise rock]], and enigmatic spoken-word passages. It divided listeners but spawned imitators in the [[underground music]] scene.
+    
+    Subsequent releases like 1973's ''Chrome Ego'' and 1975's ''Neuromancer'' ventured further into [[avant-garde music|avant-garde]], electronic, and early [[punk rock|punk]] sounds. Lennon and Clapton began incorporating political themes into abstract, poetic lyrics. While the band remained a [[cult following|cult favorite]], their experimentation alienated much of their mainstream audience from the 1960s. Lineup changes also became frequent again, with a number of musicians cycling through the band.
+    
+    ## Dissolution and legacy
+    The Beatles continued as a rotating musical collective centered around Lennon and Clapton until 1977, when Lennon was infamously murdered on stage during a concert in [[Los Angeles]]. Devastated, Clapton and the other members disbanded the group and went their separate ways. All four Beatles went on to successful [[solo artist|solo careers]] but never played together again.
+    
+    Despite (or perhaps because of) their uncompromising later years, The Beatles are remembered as one of the 20th century's most groundbreaking musical acts. Their 1960s work was crucial in establishing rock as a serious art form capable of sonic exploration and poetic expression. And their electronic experiments and abrasive proto-punk in the early 1970s, while polarizing at the time, have been heavily influential on subsequent generations of [[indie rock|indie]] and avant-garde musicians. 
+    
+    Reappraisals of the band's work continue to this day - the "Black Album" was inducted into the [[Grammy Hall of Fame]] in 1992, and 2006's ''The Beatles Reconsidered'' positioned their 1970s records as an innovative bridge between rock and the burgeoning [[electronic music|electronic]], [[noise music|noise]] and [[industrial music|industrial]] genres. [[Outtake]]s, [[demo]]s, and [[live album|live recordings]] from throughout their career continue to be reissued to eager collectors and completionists. The Beatles' turbulent history and ever-shifting style virtually guaranteed that they will remain objects of fascination, scrutiny and inspiration for generations to come.
+    </article>`,
   },
 ] as const;
 
@@ -188,7 +292,7 @@ ${systemPrompt}`;
         content: `<thoughts>`,
       },
     ],
-    model: HAIKU_MODEL,
+    model: CHEAP_MODEL,
     temperature: 1,
     max_tokens: 4000,
     stream: true,

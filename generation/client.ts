@@ -3,10 +3,10 @@ import OpenAI from "openai";
 const USE_BRAINTRUST = true;
 
 // Braintrust
-export const HAIKU_MODEL = USE_BRAINTRUST
+export const CHEAP_MODEL = USE_BRAINTRUST
   ? "claude-3-haiku-20240307"
   : // Open Router
-    "anthropic/claude-3-haiku";
+    "fireworks/mixtral-8x22b-instruct-preview";
 
 export const SONNET_MODEL = "claude-3-sonnet-20240229";
 

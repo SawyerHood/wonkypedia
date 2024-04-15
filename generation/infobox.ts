@@ -1,10 +1,10 @@
-import { HAIKU_MODEL, openai } from "./client";
+import { CHEAP_MODEL, openai } from "./client";
 
 export async function generateInfobox(
   article: string
 ): Promise<{ [key: string]: string }> {
   const response = await openai.chat.completions.create({
-    model: HAIKU_MODEL,
+    model: CHEAP_MODEL,
     max_tokens: 4000,
     messages: [
       {
