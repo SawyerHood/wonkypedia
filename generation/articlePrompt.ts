@@ -169,9 +169,6 @@ ${contextArticles
 ${systemPrompt}`;
   }
 
-  console.log("messages.length", messages.length);
-  console.log("contextArticles", contextArticles);
-
   return {
     messages: [
       {

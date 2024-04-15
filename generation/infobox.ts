@@ -23,7 +23,6 @@ export async function generateInfobox(
   });
 
   const infobox = response?.choices[0].message.content?.trim();
-  console.log("infobox:", infobox);
   return JSON.parse("{" + infobox);
 }
 

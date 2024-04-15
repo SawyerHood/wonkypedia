@@ -134,9 +134,7 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
         }
       }
     };
-    fetchArticle(title, onChunk).then(() => {
-      console.log(article);
-    });
+    fetchArticle(title, onChunk);
   }, [title, shouldStream]);
   return {
     article: article ?? localCache[title]?.article,

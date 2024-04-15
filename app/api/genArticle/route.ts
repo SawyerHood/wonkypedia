@@ -14,6 +14,7 @@ import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
 import { Json } from "@/db/schema";
 import { ChatCompletionCreateParamsStreaming } from "openai/resources/index.mjs";
+import { WRITE_TO_DB } from "@/shared/config";
 
 export const runtime = "edge";
 
@@ -72,8 +73,6 @@ export async function POST(req: Request) {
 
           articleResult += value;
 
-          console.log("new value:", value);
-
           if (!infoBoxPromise) {
             const summaryContentMatch = articleResult.match(
               /<summary>(.*?)<\/summary>/s
@@ -87,6 +86,7 @@ export async function POST(req: Request) {
         }
         await infoBoxPromise;
         await new Promise((resolve) => setTimeout(resolve, 50));
+        console.log(articleResult);
         controller.close();
       },
     }).pipeThrough(new TextEncoderStream())
@@ -94,6 +94,9 @@ export async function POST(req: Request) {
 }
 
 async function saveToDatabase(title: string, content: string) {
+  if (!WRITE_TO_DB) {
+    return;
+  }
   const { error: articleError } = await supabaseServiceClient
     .from("articles")
     .upsert([{ title, content: extractArticle(content) }], {
@@ -126,6 +129,9 @@ function getAllLinksFromInfobox(infobox: Json, links: string[] = []) {
 }
 
 async function saveInfoboxToDatabase(title: string, infoBox: Json) {
+  if (!WRITE_TO_DB) {
+    return;
+  }
   const { error: infoBoxError } = await supabaseServiceClient
     .from("articles")
     .upsert([{ title, infobox: infoBox }], {
@@ -139,6 +145,9 @@ async function saveInfoboxToDatabase(title: string, infoBox: Json) {
 }
 
 async function saveImageToDatabase(title: string, image: string) {
+  if (!WRITE_TO_DB) {
+    return;
+  }
   const { error: imageError } = await supabaseServiceClient
     .from("articles")
     .upsert([{ title, image_url: image }], {
@@ -149,6 +158,9 @@ async function saveImageToDatabase(title: string, image: string) {
 }
 
 async function saveLinksToDatabase(title: string, links: string[]) {
+  if (!WRITE_TO_DB) {
+    return;
+  }
   links = Array.from(new Set(links));
   const { error: linkError } = await supabaseServiceClient
     .from("links")
@@ -185,8 +197,6 @@ async function createArticleStream(title: string) {
     .map((link) => createMarkdown(link.from as any));
 
   const params = getMessageCreateParams(title, contextArticles);
-
-  console.log(params);
 
   // Ask Claude for a streaming chat completion given the prompt
   const response = await openai.chat.completions.create(
