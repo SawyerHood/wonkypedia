@@ -134,6 +134,7 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
     const onChunk = (chunk: string) => {
       const messages = decodeChunk(chunk);
       for (const message of messages) {
+        console.log("message", message);
         switch (message.type) {
           case "article-chunk":
             article += message.value;

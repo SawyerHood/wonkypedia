@@ -19,10 +19,12 @@ export async function genImageBlob(prompt: string): Promise<Blob> {
 }
 
 export async function genAndUploadImage(prompt: string) {
+  console.log("genAndUploadImage");
   const key = crypto.randomUUID();
+  console.log("key", key);
 
   const blob = await genImageBlob(prompt);
-  const { data: updateData, error } = await supabaseServiceClient.storage
+  const { data: _, error } = await supabaseServiceClient.storage
     .from("images")
     .upload(`${key}.png`, blob);
   if (error) {
@@ -31,6 +33,8 @@ export async function genAndUploadImage(prompt: string) {
   const { data } = await supabaseServiceClient.storage
     .from("images")
     .getPublicUrl(`${key}.png`);
+
+  console.log("imageData", data);
 
   return data.publicUrl;
 }
