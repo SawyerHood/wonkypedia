@@ -160,7 +160,11 @@ async function saveLinksToDatabase(title: string, newLinks: string[]) {
   if (!WRITE_TO_DB) {
     return;
   }
+
   newLinks = Array.from(new Set(newLinks));
+  if (!newLinks.length) {
+    return;
+  }
   const db = getDb();
   await db
     .insert(links)
