@@ -15,6 +15,11 @@ export async function genImageBlob(prompt: string): Promise<Blob> {
     options
   );
 
+  if (!resp.ok) {
+    console.error("Error generating image", await resp.text());
+    console.error("resp", resp);
+  }
+
   return await resp.blob();
 }
 
