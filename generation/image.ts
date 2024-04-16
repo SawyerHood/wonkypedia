@@ -18,7 +18,9 @@ export async function genImageBlob(prompt: string): Promise<Blob> {
   return await resp.blob();
 }
 
-export async function genAndUploadImage(prompt: string, key: string) {
+export async function genAndUploadImage(prompt: string) {
+  const key = crypto.randomUUID();
+
   const blob = await genImageBlob(prompt);
   const { data: updateData, error } = await supabaseServiceClient.storage
     .from("images")

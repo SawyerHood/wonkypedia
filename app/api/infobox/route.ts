@@ -27,10 +27,7 @@ export async function POST(req: Request) {
     );
 
     if (infobox.imageDescription) {
-      infobox.imageUrl = await genAndUploadImage(
-        infobox.imageDescription,
-        slugify(title)
-      );
+      infobox.imageUrl = await genAndUploadImage(infobox.imageDescription);
     }
 
     return new Response(JSON.stringify(infobox));

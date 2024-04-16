@@ -6,7 +6,7 @@ import {
   extractArticle,
   slugify,
 } from "@/shared/articleUtils";
-import { AnthropicStream, OpenAIStream } from "ai";
+import { OpenAIStream } from "ai";
 import { revalidatePath } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { genAndUploadImage } from "@/generation/image";
@@ -51,10 +51,7 @@ export async function POST(req: Request) {
           );
 
           if (infoBox.imageDescription) {
-            const image = await genAndUploadImage(
-              infoBox.imageDescription,
-              slugify(title)
-            );
+            const image = await genAndUploadImage(infoBox.imageDescription);
             await saveImageToDatabase(title, image);
             controller.enqueue(
               encodeMessage({
