@@ -79,7 +79,8 @@ export async function POST(req: Request) {
         console.log(articleResult);
         controller.close();
       },
-    }).pipeThrough(new TextEncoderStream())
+    }).pipeThrough(new TextEncoderStream()),
+    { status: 200 }
   );
 }
 
