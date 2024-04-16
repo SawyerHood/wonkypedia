@@ -25,7 +25,7 @@ export const createMarkdown = ({
 export const collectAllLinksFromString = (markdown: string) => {
   const links = markdown
     .match(/\[\[(.*?)\]\]/g)
-    ?.map((link) => link.replace("[[", "").replace("]]", ""));
+    ?.map((link) => link.replace("[[", "").replace("]]", "").split("|")[0]);
   return links ?? [];
 };
 

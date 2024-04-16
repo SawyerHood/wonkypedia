@@ -164,7 +164,10 @@ async function saveLinksToDatabase(title: string, newLinks: string[]) {
   const db = getDb();
   await db
     .insert(links)
-    .values(newLinks.map((link) => ({ from: title, to: link })));
+    .values(newLinks.map((link) => ({ from: title, to: link })))
+    .onConflictDoNothing({
+      target: [links.from, links.to],
+    });
 }
 
 async function createArticleStream(title: string) {

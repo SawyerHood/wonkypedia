@@ -77,7 +77,7 @@ export default function Article({
               imgUrl={imgUrl ?? null}
             />
           ) : (
-            <div className="animate-pulse bg-gray-100 p-4 rounded-lg w-full h-80"></div>
+            <div className="animate-pulse bg-gray-300 p-4 rounded-lg w-full h-80"></div>
           )}
         </div>
         {isGenerating &&
