@@ -1,8 +1,10 @@
-import { supabaseServiceClient } from "@/db/service";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
 import Generate from "@/ui/Generate";
 import Link from "next/link";
+import { getDb } from "@/db/client";
+import { articles, linkedToCount, undiscoveredLinks } from "@/drizzle/schema";
+import { desc, eq, not, and, isNotNull } from "drizzle-orm";
 
 // This will disable caching
 // export const dynamic = "force-dynamic";
@@ -11,37 +13,39 @@ import Link from "next/link";
 export const revalidate = 60;
 
 export default async function Home() {
-  const recentArticlesPromise = supabaseServiceClient
-    .from("articles")
-    .select("title, created_at")
-    .order("created_at", { ascending: false })
-    .limit(5);
+  const db = getDb();
 
-  const mostLinkedTitlesPromise = supabaseServiceClient
-    .from("linked_to_count")
-    .select("to, count")
-    .order("count", { ascending: false })
-    .neq("to", null)
-    .neq("to", "")
-    .limit(5);
+  const recentArticlesPromise = db
+    .select({ title: articles.title, createdAt: articles.createdAt })
+    .from(articles)
+    .orderBy(desc(articles.createdAt))
+    .limit(5)
+    .execute();
 
-  const undiscoveredLinksPromise = supabaseServiceClient
-    .from("undiscovered_links")
-    .select("to, count")
-    .order("count", { ascending: false })
-    .neq("to", null)
-    .neq("to", "")
-    .limit(5);
+  const mostLinkedTitlesPromise = db
+    .select({ to: linkedToCount.to, count: linkedToCount.count })
+    .from(linkedToCount)
+    .where(and(isNotNull(linkedToCount.to), not(eq(linkedToCount.to, ""))))
+    .orderBy(desc(linkedToCount.count))
+    .limit(5)
+    .execute();
 
-  const [
-    { data: recentArticles },
-    { data: mostLinkedTitles },
-    { data: undiscoveredLinks },
-  ] = await Promise.all([
-    recentArticlesPromise,
-    mostLinkedTitlesPromise,
-    undiscoveredLinksPromise,
-  ]);
+  const undiscoveredLinksPromise = db
+    .select({ to: undiscoveredLinks.to, count: undiscoveredLinks.count })
+    .from(undiscoveredLinks)
+    .where(
+      and(isNotNull(undiscoveredLinks.to), not(eq(undiscoveredLinks.to, "")))
+    )
+    .orderBy(desc(undiscoveredLinks.count))
+    .limit(5)
+    .execute();
+
+  const [recentArticles, mostLinkedTitles, undiscoveredLinksRes] =
+    await Promise.all([
+      recentArticlesPromise,
+      mostLinkedTitlesPromise,
+      undiscoveredLinksPromise,
+    ]);
 
   return (
     <div className="max-w-screen-md mx-auto p-5 flex flex-col items-center min-w-min">
@@ -70,9 +74,9 @@ export default async function Home() {
             title="Most linked articles"
           />
         )}
-        {undiscoveredLinks && undiscoveredLinks.length > 0 && (
+        {undiscoveredLinksRes && undiscoveredLinksRes.length > 0 && (
           <ArticleList
-            articles={undiscoveredLinks?.map((article) => ({
+            articles={undiscoveredLinksRes?.map((article) => ({
               title: article.to!,
             }))}
             title="Undiscovered articles"

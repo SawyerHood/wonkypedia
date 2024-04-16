@@ -1,24 +1,26 @@
-import { supabaseServiceClient } from "@/db/service";
 import { genAndUploadImage } from "@/generation/image";
 import { generateInfobox } from "@/generation/infobox";
-import { slugify } from "@/shared/articleUtils";
+import { getDb } from "@/db/client";
+import { articles } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
   // Extract the `title` from the body of the request
   const { title } = await req.json();
 
   // Find the article in the database
-  const { data: articleData, error: articleError } = await supabaseServiceClient
-    .from("articles")
-    .select("title, content")
-    .eq("title", title)
-    .single();
+  const results = await getDb()
+    .select()
+    .from(articles)
+    .where(eq(articles.title, title));
 
-  if (articleError) {
+  if (results.length === 0) {
     return new Response(JSON.stringify({ error: "Article not found." }), {
       status: 404,
     });
   }
+
+  const articleData = results[0];
 
   // Use the article content to generate an infobox
   try {

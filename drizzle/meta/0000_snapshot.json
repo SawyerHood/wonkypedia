@@ -1,0 +1,230 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "articles": {
+      "name": "articles",
+      "schema": "",
+      "columns": {
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "infobox": {
+          "name": "infobox",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "linked_to_count": {
+      "name": "linked_to_count",
+      "schema": "",
+      "columns": {
+        "to": {
+          "name": "to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "count": {
+          "name": "count",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "undiscovered_links": {
+      "name": "undiscovered_links",
+      "schema": "",
+      "columns": {
+        "to": {
+          "name": "to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "count": {
+          "name": "count",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "links": {
+      "name": "links",
+      "schema": "",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "from": {
+          "name": "from",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "to": {
+          "name": "to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'~UNKNOWN~'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "public_links_from_fkey": {
+          "name": "public_links_from_fkey",
+          "tableFrom": "links",
+          "tableTo": "articles",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "from"
+          ],
+          "columnsTo": [
+            "title"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pk_links": {
+          "name": "pk_links",
+          "columns": [
+            "from",
+            "to"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "key_status": {
+      "name": "key_status",
+      "values": {
+        "default": "default",
+        "valid": "valid",
+        "invalid": "invalid",
+        "expired": "expired"
+      }
+    },
+    "key_type": {
+      "name": "key_type",
+      "values": {
+        "aead-ietf": "aead-ietf",
+        "aead-det": "aead-det",
+        "hmacsha512": "hmacsha512",
+        "hmacsha256": "hmacsha256",
+        "auth": "auth",
+        "shorthash": "shorthash",
+        "generichash": "generichash",
+        "kdf": "kdf",
+        "secretbox": "secretbox",
+        "secretstream": "secretstream",
+        "stream_xchacha20": "stream_xchacha20"
+      }
+    },
+    "factor_type": {
+      "name": "factor_type",
+      "values": {
+        "totp": "totp",
+        "webauthn": "webauthn"
+      }
+    },
+    "factor_status": {
+      "name": "factor_status",
+      "values": {
+        "unverified": "unverified",
+        "verified": "verified"
+      }
+    },
+    "aal_level": {
+      "name": "aal_level",
+      "values": {
+        "aal1": "aal1",
+        "aal2": "aal2",
+        "aal3": "aal3"
+      }
+    },
+    "code_challenge_method": {
+      "name": "code_challenge_method",
+      "values": {
+        "s256": "s256",
+        "plain": "plain"
+      }
+    },
+    "equality_op": {
+      "name": "equality_op",
+      "values": {
+        "eq": "eq",
+        "neq": "neq",
+        "lt": "lt",
+        "lte": "lte",
+        "gt": "gt",
+        "gte": "gte",
+        "in": "in"
+      }
+    },
+    "action": {
+      "name": "action",
+      "values": {
+        "INSERT": "INSERT",
+        "UPDATE": "UPDATE",
+        "DELETE": "DELETE",
+        "TRUNCATE": "TRUNCATE",
+        "ERROR": "ERROR"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

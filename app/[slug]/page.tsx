@@ -1,6 +1,8 @@
-import { supabaseServiceClient } from "@/db/service";
 import Article from "./article";
 import { uriToTitle } from "@/shared/articleUtils";
+import { getDb } from "@/db/client";
+import { articles } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +19,12 @@ export async function generateMetadata({
 }
 
 const loadArticle = async (title: string) => {
-  const { data: article } = await supabaseServiceClient
-    .from("articles")
+  const db = getDb();
+  const article = await db
     .select()
-    .eq("title", title);
+    .from(articles)
+    .where(eq(articles.title, title))
+    .execute();
   return article;
 };
 

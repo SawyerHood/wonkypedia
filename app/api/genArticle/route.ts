@@ -1,20 +1,19 @@
-import { supabaseServiceClient } from "@/db/service";
 import { openai } from "@/generation/client";
 import {
   collectAllLinksFromString,
   createMarkdown,
   extractArticle,
-  slugify,
 } from "@/shared/articleUtils";
-import { OpenAIStream } from "ai";
 import { revalidatePath } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { genAndUploadImage } from "@/generation/image";
 import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
-import { Json } from "@/db/schema";
 import { ChatCompletionCreateParamsStreaming } from "openai/resources/index.mjs";
 import { WRITE_TO_DB } from "@/shared/config";
+import { getDb } from "@/db/client";
+import { articles, links } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export const runtime = "edge";
 
@@ -24,12 +23,8 @@ export async function POST(req: Request) {
 
   const articleStream = await createArticleStream(title);
 
-  const articleReader = articleStream
-    ?.pipeThrough(new TextDecoderStream())
-    .getReader();
-
-  if (!articleReader) {
-    return new Response("No article stream found", { status: 404 });
+  if (!articleStream) {
+    return new Response("No article stream found", { status: 500 });
   }
 
   return new Response(
@@ -62,11 +57,8 @@ export async function POST(req: Request) {
           }
         }
 
-        while (true) {
-          const { value, done } = await articleReader.read();
-          if (done) {
-            break;
-          }
+        for await (const chunk of articleStream) {
+          const value = chunk.choices[0]?.delta?.content || "";
 
           articleResult += value;
 
@@ -81,6 +73,7 @@ export async function POST(req: Request) {
 
           controller.enqueue(encodeMessage({ type: "article-chunk", value }));
         }
+        await saveToDatabase(title, articleResult);
         await infoBoxPromise;
         await new Promise((resolve) => setTimeout(resolve, 50));
         console.log(articleResult);
@@ -94,13 +87,16 @@ async function saveToDatabase(title: string, content: string) {
   if (!WRITE_TO_DB) {
     return;
   }
-  const { error: articleError } = await supabaseServiceClient
-    .from("articles")
-    .upsert([{ title, content: extractArticle(content) }], {
-      onConflict: "title",
+  const db = getDb();
+  await db
+    .insert(articles)
+    .values({ title, content: extractArticle(content) })
+    .onConflictDoUpdate({
+      target: articles.title,
+      set: {
+        content: extractArticle(content),
+      },
     });
-
-  if (articleError) throw articleError;
 
   const markdown = createMarkdown({ title, content });
   const links = collectAllLinksFromString(markdown);
@@ -110,7 +106,7 @@ async function saveToDatabase(title: string, content: string) {
   revalidatePath("/" + encodeURIComponent(title));
 }
 
-function getAllLinksFromInfobox(infobox: Json, links: string[] = []) {
+function getAllLinksFromInfobox(infobox: Object, links: string[] = []) {
   if (typeof infobox === "string") {
     links.push(...collectAllLinksFromString(infobox));
   } else if (Array.isArray(infobox)) {
@@ -125,17 +121,20 @@ function getAllLinksFromInfobox(infobox: Json, links: string[] = []) {
   return links;
 }
 
-async function saveInfoboxToDatabase(title: string, infoBox: Json) {
+async function saveInfoboxToDatabase(title: string, infoBox: Object) {
   if (!WRITE_TO_DB) {
     return;
   }
-  const { error: infoBoxError } = await supabaseServiceClient
-    .from("articles")
-    .upsert([{ title, infobox: infoBox }], {
-      onConflict: "title",
+  const db = getDb();
+  await db
+    .insert(articles)
+    .values({ title, infobox: infoBox })
+    .onConflictDoUpdate({
+      target: articles.title,
+      set: {
+        infobox: infoBox,
+      },
     });
-
-  if (infoBoxError) throw infoBoxError;
 
   const links = getAllLinksFromInfobox(infoBox);
   await saveLinksToDatabase(title, links);
@@ -145,67 +144,62 @@ async function saveImageToDatabase(title: string, image: string) {
   if (!WRITE_TO_DB) {
     return;
   }
-  const { error: imageError } = await supabaseServiceClient
-    .from("articles")
-    .upsert([{ title, image_url: image }], {
-      onConflict: "title",
+  const db = getDb();
+  await db
+    .insert(articles)
+    .values({ title, imageUrl: image })
+    .onConflictDoUpdate({
+      target: articles.title,
+      set: {
+        imageUrl: image,
+      },
     });
-
-  if (imageError) throw imageError;
 }
 
-async function saveLinksToDatabase(title: string, links: string[]) {
+async function saveLinksToDatabase(title: string, newLinks: string[]) {
   if (!WRITE_TO_DB) {
     return;
   }
-  links = Array.from(new Set(links));
-  const { error: linkError } = await supabaseServiceClient
-    .from("links")
-    .upsert(links.map((link) => ({ from: title, to: link })));
-
-  if (linkError) console.error(linkError);
+  newLinks = Array.from(new Set(newLinks));
+  const db = getDb();
+  await db
+    .insert(links)
+    .values(newLinks.map((link) => ({ from: title, to: link })));
 }
 
 async function createArticleStream(title: string) {
-  const existingArticleCheck = await supabaseServiceClient
-    .from("articles")
-    .select("title, content")
-    .eq("title", title)
-    .single();
+  const db = getDb();
+  const existingArticleCheck = await db
+    .select()
+    .from(articles)
+    .where(eq(articles.title, title));
 
-  if (existingArticleCheck.data) {
+  if (existingArticleCheck.length) {
     return null;
   }
 
-  const result = supabaseServiceClient
-    .from("links")
-    .select("to, from (title, content)")
-    .limit(10)
-    .eq("to", title);
+  const result = await db.query.links.findMany({
+    with: {
+      from: true,
+    },
+    where: (links, { eq }) => eq(links.to, title),
+  });
 
-  const { data: context, error } = await result;
-
-  if (error) {
-    throw error;
-  }
+  const context = await result;
 
   const contextArticles = context
     .filter((link) => link.from)
-    .map((link) => createMarkdown(link.from as any));
+    .map((link) => createMarkdown(link.from));
+
+  console.log("Context:");
+  console.log(contextArticles);
 
   const params = getMessageCreateParams(title, contextArticles);
 
   // Ask Claude for a streaming chat completion given the prompt
-  const response = await openai.chat.completions.create(
+  const stream = await openai.chat.completions.create(
     params as ChatCompletionCreateParamsStreaming
   );
-
-  // Convert the response into a friendly text-stream
-  const stream = OpenAIStream(response, {
-    onCompletion: async (completion) => {
-      await saveToDatabase(title, completion);
-    },
-  });
 
   return stream;
 }

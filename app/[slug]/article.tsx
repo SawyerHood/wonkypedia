@@ -15,14 +15,19 @@ import {
 import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
-import { Database } from "@/db/schema";
 
 export default function Article({
   title,
   article,
 }: {
   title: string;
-  article: Database["public"]["Tables"]["articles"]["Row"] | null;
+  article: {
+    title: string;
+    content: string | null;
+    createdAt: string;
+    imageUrl: string | null;
+    infobox: unknown;
+  } | null;
 }) {
   const isGenerating = !article;
   const {
@@ -32,7 +37,7 @@ export default function Article({
   } = useGeneratedArticle(title, isGenerating);
 
   const infobox = article?.infobox ?? streamedInfoBox;
-  const imgUrl = article?.image_url ?? streamedImgUrl;
+  const imgUrl = article?.imageUrl ?? streamedImgUrl;
 
   let markdown = article?.content
     ? article?.content
