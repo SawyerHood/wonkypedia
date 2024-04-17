@@ -5,6 +5,7 @@ import logo from "@/assets/wonkypedia.png";
 import Link from "next/link";
 import Generate from "./Generate";
 import { Grid } from "./Grid";
+import { GoogleButton } from "./GoogleButton";
 
 const Header = async () => {
   const session = await auth();
@@ -37,12 +38,7 @@ const Header = async () => {
               Sign Out
             </button>
           ) : (
-            <button
-              type="submit"
-              className="text-blue-500 hover:text-blue-700 underline font-bold py-2 px-4"
-            >
-              Sign In
-            </button>
+            <GoogleButton />
           )}
         </form>
       </Grid>
