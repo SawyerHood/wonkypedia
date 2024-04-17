@@ -4,7 +4,6 @@ import Link from "next/link";
 import { getDb } from "@/db/client";
 import { articles, linkedToCount, undiscoveredLinks } from "@/drizzle/schema";
 import { desc, eq, not, and, isNotNull } from "drizzle-orm";
-import { auth } from "@/auth";
 
 // This will disable caching
 export const dynamic = "force-dynamic";
