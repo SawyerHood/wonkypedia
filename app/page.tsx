@@ -104,6 +104,7 @@ function ArticleList({
               <Link
                 href={`/${article.title}`}
                 className="text-blue-500 hover:underline"
+                prefetch={false}
               >
                 {article.title}
               </Link>
