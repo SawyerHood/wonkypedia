@@ -34,6 +34,7 @@ export default function Article({
     article: streamedResponse,
     infobox: streamedInfoBox,
     imgUrl: streamedImgUrl,
+    isLoading,
   } = useGeneratedArticle(title, isGenerating);
 
   const infobox = article?.infobox ?? streamedInfoBox;
@@ -70,13 +71,15 @@ export default function Article({
       </div>
       <div className="col-span-9">
         <div className="md:float-right md:max-w-xs md:pl-4 pb-4 max-w-full bg-white w-full">
-          {infobox ? (
+          {infobox && (
             <Infobox
               infobox={infobox as any}
               title={title}
               imgUrl={imgUrl ?? null}
+              isLoading={isLoading}
             />
-          ) : (
+          )}
+          {!infobox && isLoading && (
             <div className="animate-pulse bg-gray-300 p-4 rounded-lg w-full h-80"></div>
           )}
         </div>
@@ -111,12 +114,14 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
   );
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const startedRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (!shouldStream || startedRef.current || localCache[title]) {
       return;
     }
 
     startedRef.current = true;
+    setIsLoading(true);
 
     const updateCache = <T extends keyof (typeof localCache)[string]>(
       key: T,
@@ -152,12 +157,15 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
         }
       }
     };
-    fetchArticle(title, onChunk);
+    fetchArticle(title, onChunk).then(() => {
+      setIsLoading(false);
+    });
   }, [title, shouldStream]);
   return {
     article: article ?? localCache[title]?.article,
     infobox: infobox ?? localCache[title]?.infobox,
     imgUrl: imgUrl ?? localCache[title]?.imgUrl,
+    isLoading,
   };
 }
 
@@ -201,17 +209,18 @@ function Infobox({
   infobox,
   title,
   imgUrl,
+  isLoading,
 }: {
   infobox: { [key: string]: string };
   title: string;
   imgUrl: string | null;
+  isLoading: boolean;
 }) {
   return (
     <div className="bg-gray-100 p-4 rounded-lg">
       <h2 className="text-lg font-bold mb-2">{title}</h2>
-      {imgUrl ? (
-        <img src={imgUrl} alt={title} className="mb-4 w-full" />
-      ) : (
+      {imgUrl && <img src={imgUrl} alt={title} className="mb-4 w-full" />}
+      {!imgUrl && isLoading && (
         <div className="animate-pulse bg-gray-300 w-full aspect-square mb-4"></div>
       )}
       <table className="text-xs border-spacing-4">
