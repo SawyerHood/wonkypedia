@@ -2,10 +2,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import logo from "@/assets/wonkypedia.png";
-import Generate from "@/ui/Generate";
-import Link from "next/link";
 import {
   afterArticleTag,
   createHashLink,
@@ -15,6 +11,7 @@ import {
 import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
+import { Grid } from "@/ui/Grid";
 
 export default function Article({
   title,
@@ -53,19 +50,7 @@ export default function Article({
   markdown = removeArticleTag(linkify(markdown));
 
   return (
-    <div className="max-w-screen-xl mx-auto container w-full grid grid-cols-9 md:grid-cols-12 md:gap-x-12 gap-y-4 p-4 overflow-hidden">
-      <Link href="/" className="flex items-center col-span-9 md:hidden">
-        <Image src={logo} alt="Wonkypedia" width={50} height={50} />
-        <span className="ml-2 text-2xl font-serif">Wonkypedia</span>
-      </Link>
-      <div className="col-span-3 hidden md:block">
-        <Link href="/">
-          <Image src={logo} alt="Wonkypedia" width={94} height={94} />
-        </Link>
-      </div>
-      <div className="col-span-9">
-        <Generate />
-      </div>
+    <Grid className="p-4">
       <div className="col-span-3 hidden md:block">
         <Contents markdown={markdown} />
       </div>
@@ -94,7 +79,7 @@ export default function Article({
           <MarkdownRenderer markdown={markdown} />
         )}
       </div>
-    </div>
+    </Grid>
   );
 }
 

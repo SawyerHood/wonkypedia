@@ -1,16 +1,13 @@
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
-import Generate from "@/ui/Generate";
 import Link from "next/link";
 import { getDb } from "@/db/client";
 import { articles, linkedToCount, undiscoveredLinks } from "@/drizzle/schema";
 import { desc, eq, not, and, isNotNull } from "drizzle-orm";
+import { auth } from "@/auth";
 
 // This will disable caching
-// export const dynamic = "force-dynamic";
-
-// Revalidate every minute
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const db = getDb();
@@ -50,7 +47,6 @@ export default async function Home() {
   return (
     <div className="max-w-screen-md mx-auto p-5 flex flex-col items-center min-w-min">
       <Image src={logo} alt="Wonkypedia" width={512} height={512} />
-      <Generate className="mt-8 w-full" />
       <div className="mt-8 p-4 w-full bg-blue-50 border border-blue-300">
         <h5 className="mb-2 text-xl font-semibold text-blue-800">
           What is Wonkypedia?
