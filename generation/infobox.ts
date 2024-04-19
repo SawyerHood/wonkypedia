@@ -1,11 +1,14 @@
-import { CHEAP_MODEL, openai } from "./client";
+import { CHEAP_MODEL, MODEL, openai } from "./client";
 
 export async function generateInfobox(
   article: string
-): Promise<{ [key: string]: string }> {
+): Promise<{ [key: string]: string } | null> {
   const response = await openai.chat.completions.create({
     model: CHEAP_MODEL,
     max_tokens: 4000,
+    response_format: {
+      type: "json_object",
+    },
     messages: [
       {
         role: "system",
@@ -23,7 +26,17 @@ export async function generateInfobox(
   });
 
   const infobox = response?.choices[0].message.content?.trim();
-  return JSON.parse("{" + infobox);
+  if (!infobox) {
+    return null;
+  }
+  try {
+    const json = JSON.parse(infobox);
+    return json;
+  } catch (e) {
+    console.error(e);
+    console.log(infobox);
+    return null;
+  }
 }
 
 const system = `You are an expert at writing infoboxes for wikipedia articles.  The user will give you a summary of an article and you will create the infobox for it.
@@ -39,6 +52,7 @@ An infobox on Wikipedia serves to succinctly summarize key information about the
 - If the info box shouldn't contain an image, don't include the imageDescription key.
 - If the info box is about a proper noun, make sure to mention it in the imageDescription.
 - Don't summarize the outline, add supplemental metadata to the infobox.
+- Return only the JSON.
 
 The returned JSON must conform to this typescript type:
 

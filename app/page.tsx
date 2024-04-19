@@ -15,6 +15,7 @@ export default async function Home() {
     .select({ title: articles.title, createdAt: articles.createdAt })
     .from(articles)
     .orderBy(desc(articles.createdAt))
+    .where(isNotNull(articles.content))
     .limit(5)
     .execute();
 

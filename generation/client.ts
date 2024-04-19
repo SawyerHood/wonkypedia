@@ -1,22 +1,51 @@
 import OpenAI from "openai";
 
-const USE_BRAINTRUST = true;
+const MODE: "openrouter" | "braintrust" | "groq" = "groq" as const;
 
-// Braintrust
-export const CHEAP_MODEL = USE_BRAINTRUST
-  ? "claude-3-haiku-20240307"
-  : // Open Router
-    "fireworks/mixtral-8x22b-instruct-preview";
+const getModel = (mode: "openrouter" | "braintrust" | "groq") => {
+  switch (mode) {
+    case "braintrust":
+      return "claude-3-haiku-20240307";
+    case "openrouter":
+      return "fireworks/mixtral-8x22b-instruct-preview";
+    case "groq":
+      return "llama3-70b-8192";
+  }
+};
 
-export const SONNET_MODEL = "claude-3-sonnet-20240229";
+const getCheapModel = (mode: "openrouter" | "braintrust" | "groq") => {
+  switch (mode) {
+    case "openrouter":
+      return "fireworks/mixtral-8x22b-instruct-preview";
+    case "braintrust":
+      return "claude-3-haiku-20240307";
+    case "groq":
+      return "llama3-8b-8192";
+  }
+};
 
-// Braintrust
-export const openai = USE_BRAINTRUST
-  ? new OpenAI({
-      baseURL: "https://braintrustproxy.com/v1",
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    })
-  : new OpenAI({
-      baseURL: "https://openrouter.ai/api/v1",
-      apiKey: process.env.OPEN_ROUTER_KEY,
-    });
+const createClient = (mode: "openrouter" | "braintrust" | "groq") => {
+  switch (mode) {
+    case "openrouter":
+      return new OpenAI({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPEN_ROUTER_KEY,
+      });
+    case "braintrust":
+      return new OpenAI({
+        baseURL: "https://braintrustproxy.com/v1",
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+    case "groq":
+      return new OpenAI({
+        baseURL: "https://api.groq.com/openai/v1",
+        apiKey: process.env.GROQ_API_KEY,
+      });
+  }
+};
+
+export const MODEL = getModel(MODE);
+
+export const CHEAP_MODEL = getCheapModel(MODE);
+
+export const openai = createClient(MODE);

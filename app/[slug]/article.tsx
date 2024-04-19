@@ -139,6 +139,11 @@ function useGeneratedArticle(title: string, shouldStream: boolean) {
             setImgUrl(message.value);
             updateCache("imgUrl", message.value);
             break;
+          case "linkify":
+            const value = `<article>\n${message.value}\n</article>`;
+            setArticle(value);
+            updateCache("article", value);
+            break;
         }
       }
     };
@@ -204,7 +209,9 @@ function Infobox({
   return (
     <div className="bg-gray-100 p-4 rounded-lg">
       <h2 className="text-lg font-bold mb-2">{title}</h2>
-      {imgUrl && <img src={imgUrl} alt={title} className="mb-4 w-full" />}
+      {imgUrl && (
+        <img src={imgUrl} alt={title} className="mb-4 w-full aspect-square" />
+      )}
       {!imgUrl && isLoading && (
         <div className="animate-pulse bg-gray-300 w-full aspect-square mb-4"></div>
       )}

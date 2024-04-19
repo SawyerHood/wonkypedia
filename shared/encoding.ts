@@ -1,16 +1,27 @@
 type Message = {
-  type: "info-box" | "article-chunk" | "image";
+  type: "info-box" | "article-chunk" | "image" | "linkify";
   value: string;
 };
 
 export function encodeMessage(message: Message) {
+  let shortType;
+  switch (message.type) {
+    case "info-box":
+      shortType = "ib";
+      break;
+    case "article-chunk":
+      shortType = "ac";
+      break;
+    case "linkify":
+      shortType = "l";
+      break;
+    case "image":
+      shortType = "i";
+      break;
+  }
+
   const shortMessage = {
-    t:
-      message.type === "info-box"
-        ? "ib"
-        : message.type === "article-chunk"
-        ? "ac"
-        : "i",
+    t: shortType,
     v: message.value,
   };
   return "👉" + JSON.stringify(shortMessage) + "👈";
@@ -18,13 +29,28 @@ export function encodeMessage(message: Message) {
 
 export function decodeMessage(message: string): Message {
   const shortMessage = JSON.parse(message.replace(/^👉|👈$/g, ""));
+  let longType: Message["type"] | null = null;
+  switch (shortMessage.t) {
+    case "ib":
+      longType = "info-box";
+      break;
+    case "ac":
+      longType = "article-chunk";
+      break;
+    case "l":
+      longType = "linkify";
+      break;
+    case "i":
+      longType = "image";
+      break;
+  }
+
+  if (!longType) {
+    throw new Error("Invalid message type");
+  }
+
   return {
-    type:
-      shortMessage.t === "ib"
-        ? "info-box"
-        : shortMessage.t === "ac"
-        ? "article-chunk"
-        : "image",
+    type: longType,
     value: shortMessage.v,
   };
 }

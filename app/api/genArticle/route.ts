@@ -14,6 +14,7 @@ import { WRITE_TO_DB } from "@/shared/config";
 import { getDb } from "@/db/client";
 import { articles, links } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { linkify } from "@/generation/linkify";
 
 export const runtime = "edge";
 
@@ -35,6 +36,9 @@ export async function POST(req: Request) {
 
         async function startInfoBox(summary: string) {
           const infoBox = await generateInfobox(summary);
+          if (!infoBox) {
+            return;
+          }
 
           await saveInfoboxToDatabase(title, infoBox);
 
@@ -73,7 +77,13 @@ export async function POST(req: Request) {
 
           controller.enqueue(encodeMessage({ type: "article-chunk", value }));
         }
-        await saveToDatabase(title, articleResult);
+        const article = extractArticle(articleResult ?? "");
+        // const linkified = await linkify(article ?? "");
+        const linkified = article ?? "";
+        controller.enqueue(
+          encodeMessage({ type: "linkify", value: linkified })
+        );
+        await saveToDatabase(title, linkified);
         await infoBoxPromise;
         await new Promise((resolve) => setTimeout(resolve, 50));
         console.log(articleResult);
@@ -89,15 +99,12 @@ async function saveToDatabase(title: string, content: string) {
     return;
   }
   const db = getDb();
-  await db
-    .insert(articles)
-    .values({ title, content: extractArticle(content) })
-    .onConflictDoUpdate({
-      target: articles.title,
-      set: {
-        content: extractArticle(content),
-      },
-    });
+  await db.insert(articles).values({ title, content }).onConflictDoUpdate({
+    target: articles.title,
+    set: {
+      content,
+    },
+  });
 
   const markdown = createMarkdown({ title, content });
   const links = collectAllLinksFromString(markdown);
@@ -204,10 +211,13 @@ async function createArticleStream(title: string) {
 
   const params = getMessageCreateParams(title, contextArticles);
 
+  console.log("Before stream");
   // Ask Claude for a streaming chat completion given the prompt
   const stream = await openai.chat.completions.create(
     params as ChatCompletionCreateParamsStreaming
   );
+
+  console.log("After stream");
 
   return stream;
 }
