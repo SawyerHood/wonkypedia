@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-const MODE: "openrouter" | "braintrust" | "groq" = "groq" as const;
+const MODE: "openrouter" | "braintrust" | "groq" = "braintrust" as const;
 
 const getModel = (mode: "openrouter" | "braintrust" | "groq") => {
   switch (mode) {

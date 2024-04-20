@@ -14,7 +14,6 @@ import { WRITE_TO_DB } from "@/shared/config";
 import { getDb } from "@/db/client";
 import { articles, links } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
-import { linkify } from "@/generation/linkify";
 
 export const runtime = "edge";
 

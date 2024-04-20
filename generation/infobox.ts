@@ -6,9 +6,9 @@ export async function generateInfobox(
   const response = await openai.chat.completions.create({
     model: CHEAP_MODEL,
     max_tokens: 4000,
-    response_format: {
-      type: "json_object",
-    },
+    // response_format: {
+    //   type: "json_object",
+    // },
     messages: [
       {
         role: "system",
@@ -30,7 +30,7 @@ export async function generateInfobox(
     return null;
   }
   try {
-    const json = JSON.parse(infobox);
+    const json = JSON.parse("{" + infobox);
     return json;
   } catch (e) {
     console.error(e);
