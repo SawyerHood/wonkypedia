@@ -58,7 +58,7 @@ export const linkify = (text: string) => {
   if (typeof text !== "string") return "";
   return text.replace(
     /\[\[(.*?)(?:\|(.*?))?\]\]/g,
-    (_, p1, p2) => `[${p2 || p1}](/${encodeURIComponent(p1)})`
+    (_, p1, p2) => `[${p2 || p1}](/article/${encodeURIComponent(p1)})`
   );
 };
 

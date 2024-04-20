@@ -98,7 +98,7 @@ function ArticleList({
           {articles?.map((article) => (
             <li key={article.title}>
               <Link
-                href={`/${article.title}`}
+                href={`/article/${article.title}`}
                 className="text-blue-500 hover:underline"
                 prefetch={false}
               >
