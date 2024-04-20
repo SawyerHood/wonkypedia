@@ -46,7 +46,7 @@ export default async function Home() {
 
   return (
     <div className="max-w-screen-md mx-auto p-5 flex flex-col items-center min-w-min">
-      <Image src={logo} alt="Wonkypedia" width={512} height={512} />
+      <Image src={logo} alt="Wonkypedia" width={256} height={256} />
       <div className="mt-8 p-4 w-full bg-blue-50 border border-blue-300">
         <h5 className="mb-2 text-xl font-semibold text-blue-800">
           What is Wonkypedia?
