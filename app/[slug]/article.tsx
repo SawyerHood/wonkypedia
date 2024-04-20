@@ -12,10 +12,13 @@ import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
 import { Grid } from "@/ui/Grid";
+import { Session } from "next-auth";
 
 export default function Article({
   title,
   article,
+  session,
+  loginSection,
 }: {
   title: string;
   article: {
@@ -25,14 +28,18 @@ export default function Article({
     imageUrl: string | null;
     infobox: unknown;
   } | null;
+  session: Session | null;
+  loginSection: React.ReactNode;
 }) {
-  const isGenerating = !article;
+  const isGenerating = !article && !!session;
   const {
     article: streamedResponse,
     infobox: streamedInfoBox,
     imgUrl: streamedImgUrl,
     isLoading,
   } = useGeneratedArticle(title, isGenerating);
+
+  const needsLogin = !session && !article;
 
   const infobox = article?.infobox ?? streamedInfoBox;
   const imgUrl = article?.imageUrl ?? streamedImgUrl;
@@ -50,36 +57,39 @@ export default function Article({
   markdown = removeArticleTag(linkify(markdown));
 
   return (
-    <Grid className="p-4">
-      <div className="col-span-3 hidden md:block">
-        <Contents markdown={markdown} />
-      </div>
-      <div className="col-span-9">
-        <div className="md:float-right md:max-w-xs md:pl-4 pb-4 max-w-full bg-white w-full">
-          {infobox && (
-            <Infobox
-              infobox={infobox as any}
-              title={title}
-              imgUrl={imgUrl ?? null}
-              isLoading={isLoading}
-            />
-          )}
-          {!infobox && isLoading && (
-            <div className="animate-pulse bg-gray-300 p-4 rounded-lg w-full h-80"></div>
+    <>
+      <Grid className="p-4 relative">
+        <div className="col-span-3 hidden md:block">
+          <Contents markdown={markdown} />
+        </div>
+        <div className="col-span-9">
+          <div className="md:float-right md:max-w-xs md:pl-4 pb-4 max-w-full bg-white w-full">
+            {infobox && (
+              <Infobox
+                infobox={infobox as any}
+                title={title}
+                imgUrl={imgUrl ?? null}
+                isLoading={isLoading}
+              />
+            )}
+            {!infobox && isLoading && (
+              <div className="animate-pulse bg-gray-300 p-4 rounded-lg w-full h-80"></div>
+            )}
+          </div>
+          {(isGenerating || needsLogin) &&
+          markdown.split("\n").filter((l) => Boolean(l.trim())).length < 2 ? (
+            <>
+              <LoadingSkeleton />
+              <LoadingSkeleton />
+              <LoadingSkeleton />
+            </>
+          ) : (
+            <MarkdownRenderer markdown={markdown} />
           )}
         </div>
-        {isGenerating &&
-        markdown.split("\n").filter((l) => Boolean(l.trim())).length < 2 ? (
-          <>
-            <LoadingSkeleton />
-            <LoadingSkeleton />
-            <LoadingSkeleton />
-          </>
-        ) : (
-          <MarkdownRenderer markdown={markdown} />
-        )}
-      </div>
-    </Grid>
+        {needsLogin && loginSection}
+      </Grid>
+    </>
   );
 }
 

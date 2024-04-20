@@ -3,6 +3,8 @@ import { uriToTitle } from "@/shared/articleUtils";
 import { getDb } from "@/db/client";
 import { articles } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { auth } from "@/auth";
+import { LoginBlock } from "@/ui/LoginBlock";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +32,15 @@ const loadArticle = async (title: string) => {
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const title = uriToTitle(params.slug);
+  const session = await auth();
   const article = await loadArticle(title);
 
-  return <Article title={title} article={article?.[0] ?? null} />;
+  return (
+    <Article
+      title={title}
+      article={article?.[0] ?? null}
+      session={session}
+      loginSection={<LoginBlock />}
+    />
+  );
 }
