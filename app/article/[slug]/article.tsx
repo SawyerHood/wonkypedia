@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   afterArticleTag,
   createHashLink,
-  linkify,
+  transformLinks,
   removeArticleTag,
 } from "@/shared/articleUtils";
 import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
@@ -54,7 +54,7 @@ export default function Article({
 
   markdown = `# ${title}` + "\n" + markdown;
 
-  markdown = removeArticleTag(linkify(markdown));
+  markdown = removeArticleTag(transformLinks(markdown));
 
   return (
     <>
@@ -234,7 +234,7 @@ function Infobox({
                   <td className="font-bold p-1 min-w-24">{key}</td>
                   <td className="p-1">
                     <LinkOnlyRenderer
-                      markdown={linkify(
+                      markdown={transformLinks(
                         Array.isArray(value) ? value.join(" • ") : value
                       )}
                     />

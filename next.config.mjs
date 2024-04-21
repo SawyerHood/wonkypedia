@@ -9,6 +9,13 @@ const nextConfig = {
 
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "sfozpnhknzamtdqmmjtl.supabase.co",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

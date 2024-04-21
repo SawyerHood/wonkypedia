@@ -5,7 +5,7 @@ const MODE: "openrouter" | "braintrust" | "groq" = "braintrust" as const;
 const getModel = (mode: "openrouter" | "braintrust" | "groq") => {
   switch (mode) {
     case "braintrust":
-      return "claude-3-haiku-20240307";
+      return "claude-3-opus-20240229";
     case "openrouter":
       return "fireworks/mixtral-8x22b-instruct-preview";
     case "groq":

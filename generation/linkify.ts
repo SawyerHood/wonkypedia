@@ -8,7 +8,7 @@ export async function linkify(article: string): Promise<string> {
       {
         role: "system",
         content:
-          "You will be given a markdown article for a wikipedia entry. Edit this to link to other articles by wrapping them in [[links]]. Use double square brackets to link. Skip the preamble and return only the article.",
+          "You will be given a markdown article for a wikipedia entry. Edit this to link to other articles by wrapping them in [[links]]. Use double square brackets to link. Skip the preamble and return only the article. Skip the preamble. Return only the article",
       },
       {
         role: "user",

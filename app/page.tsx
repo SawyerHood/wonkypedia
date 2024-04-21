@@ -1,113 +1,189 @@
-import Image from "next/image";
-import logo from "@/assets/wonkypedia.png";
-import Link from "next/link";
-import { getDb } from "@/db/client";
-import { articles, linkedToCount, undiscoveredLinks } from "@/drizzle/schema";
-import { desc, eq, not, and, isNotNull } from "drizzle-orm";
+import cx from "classnames";
 
-// This will disable caching
-export const dynamic = "force-dynamic";
+import MarkdownRenderer from "@/ui/MarkdownRenderer";
+import { transformLinks } from "@/shared/articleUtils";
+import sawyer from "@/assets/sawyer.jpg";
+import logo from "./icon.png";
+import Image from "next/image";
+import Link from "next/link";
+
+function Card({
+  colorScheme,
+  title,
+  children,
+  className,
+}: {
+  colorScheme: "blue" | "green" | "gray" | "purple";
+  title?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  cta?: React.ReactNode;
+}) {
+  const colorSchemes = {
+    blue: {
+      bgColor: "bg-blue-50 border-blue-300 text-blue-800",
+      textColor: "text-gray-600",
+      headingColor: "text-blue-800",
+    },
+    green: {
+      bgColor: "bg-green-100 border-green-400 text-green-900",
+      textColor: "text-gray-600",
+      headingColor: "text-green-900",
+    },
+    gray: {
+      bgColor: "bg-gray-50 border-gray-300 text-gray-800",
+      textColor: "text-gray-600",
+      headingColor: "text-gray-800",
+    },
+    purple: {
+      bgColor: "bg-purple-50 border-purple-300 text-purple-800",
+      textColor: "text-gray-600",
+      headingColor: "text-purple-800",
+    },
+  };
+
+  const { bgColor, textColor, headingColor } = colorSchemes[colorScheme];
+
+  return (
+    <div className={cx(`p-4 w-full`, bgColor, `border`, className)}>
+      {title && (
+        <h5 className={cx(`mb-2 text-xl font-semibold`, headingColor)}>
+          {title}
+        </h5>
+      )}
+      <div className={cx(`font-light`, textColor)}>{children}</div>
+    </div>
+  );
+}
+
+export const revalidate = 60 * 60;
+
+const jsonURL =
+  "https://sfozpnhknzamtdqmmjtl.supabase.co/storage/v1/object/public/homepage/homepage.json";
 
 export default async function Home() {
-  const db = getDb();
+  const resp = await fetch(jsonURL, { next: { revalidate: 60 * 60 } });
+  const data = await resp.blob();
 
-  const recentArticlesPromise = db
-    .select({ title: articles.title, createdAt: articles.createdAt })
-    .from(articles)
-    .orderBy(desc(articles.createdAt))
-    .where(isNotNull(articles.content))
-    .limit(5)
-    .execute();
-
-  const mostLinkedTitlesPromise = db
-    .select({ to: linkedToCount.to, count: linkedToCount.count })
-    .from(linkedToCount)
-    .where(and(isNotNull(linkedToCount.to), not(eq(linkedToCount.to, ""))))
-    .orderBy(desc(linkedToCount.count))
-    .limit(5)
-    .execute();
-
-  const undiscoveredLinksPromise = db
-    .select({ to: undiscoveredLinks.to, count: undiscoveredLinks.count })
-    .from(undiscoveredLinks)
-    .where(
-      and(isNotNull(undiscoveredLinks.to), not(eq(undiscoveredLinks.to, "")))
-    )
-    .orderBy(desc(undiscoveredLinks.count))
-    .limit(5)
-    .execute();
-
-  const [recentArticles, mostLinkedTitles, undiscoveredLinksRes] =
-    await Promise.all([
-      recentArticlesPromise,
-      mostLinkedTitlesPromise,
-      undiscoveredLinksPromise,
-    ]);
+  const homepageInfo: {
+    summary: string;
+    summaryImage: string;
+    summaryTitle: string;
+    didYouKnow: string;
+    didYouKnowImage: string;
+  } = JSON.parse(await data.text());
 
   return (
-    <div className="max-w-screen-md mx-auto p-5 flex flex-col items-center min-w-min">
-      <Image src={logo} alt="Wonkypedia" width={256} height={256} />
-      <div className="mt-8 p-4 w-full bg-blue-50 border border-blue-300">
-        <h5 className="mb-2 text-xl font-semibold text-blue-800">
-          What is Wonkypedia?
-        </h5>
-        <p className="mb-3 font-light text-blue-600">
-          Wonkypedia is a free encyclopedia for an alternative universe. It is
-          for those who love going down wiki rabbit holes, but are tired of
-          doing learning about real things. As you click between links, articles
-          are generated on the fly, building out a shared universe.
-        </p>
-      </div>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 w-full ">
-        {recentArticles && recentArticles.length > 0 && (
-          <ArticleList articles={recentArticles} title="Recent articles" />
-        )}
-        {mostLinkedTitles && mostLinkedTitles.length > 0 && (
-          <ArticleList
-            articles={mostLinkedTitles?.map((article) => ({
-              title: article.to!,
-            }))}
-            title="Most linked articles"
+    <div className="max-w-screen-lg mx-auto p-4 flex flex-col items-center min-w-min">
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-2">
+        <Card
+          colorScheme="gray"
+          title="What is Wonkypedia?"
+          className="col-start-1"
+        >
+          <p>
+            Wonkypedia is a free encyclopedia for an alternative universe. It is
+            for those who love going down wiki rabbit holes, but are tired of
+            doing learning about real things. As you click between links,
+            articles are generated on the fly, building out a shared universe.
+          </p>
+        </Card>
+        <Card
+          colorScheme="blue"
+          title="From the Article of the Day"
+          className="md:col-start-1"
+        >
+          <Image
+            src={homepageInfo.summaryImage}
+            alt="Summary Image"
+            width={148}
+            height={148}
+            className="float-right ml-4 mb-4"
           />
-        )}
-        {undiscoveredLinksRes && undiscoveredLinksRes.length > 0 && (
-          <ArticleList
-            articles={undiscoveredLinksRes?.map((article) => ({
-              title: article.to!,
-            }))}
-            title="Undiscovered articles"
+          <MarkdownRenderer markdown={transformLinks(homepageInfo.summary)} />
+          <Link
+            href={`/article/${homepageInfo.summaryTitle}`}
+            className="text-blue-500 hover:underline"
+          >
+            Read More...
+          </Link>
+        </Card>
+        <Card
+          colorScheme="green"
+          title="Did You Know?"
+          className="md:col-start-2 md:row-start-1 md:row-span-2"
+        >
+          <Image
+            src={homepageInfo.didYouKnowImage}
+            alt="Did You Know Image"
+            width={148}
+            height={148}
+            className="float-right ml-4 mb-4"
           />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ArticleList({
-  articles,
-  title,
-}: {
-  articles: { title: string }[];
-  title: string;
-}) {
-  return (
-    <div className="mb-4">
-      <div>
-        <h2 className="text-lg font-bold mb-2">{title}</h2>
-        <ul className="list-disc pl-5">
-          {articles?.map((article) => (
-            <li key={article.title}>
-              <Link
-                href={`/article/${article.title}`}
-                className="text-blue-500 hover:underline"
-                prefetch={false}
+          <MarkdownRenderer
+            markdown={transformLinks(homepageInfo.didYouKnow)}
+          />
+        </Card>
+        <Card
+          colorScheme="purple"
+          className="col-span-1 md:col-span-2"
+          title="Please Read: A personal appeal from Wonkypedia's Founder"
+        >
+          <div className="flex flex-col-reverse md:flex-row gap-4 items-center">
+            <div className="flex flex-col gap-2">
+              <Image
+                src={sawyer}
+                alt="Sawyer Hood"
+                width={200}
+                height={200}
+                className="aspect-square max-w-[200px] max-h-[200px]"
+              />
+              <a
+                href="https://www.buymeacoffee.com/sawyerhood"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {article.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
+                <button className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded w-full">
+                  Donate Now
+                </button>
+              </a>
+            </div>
+            <div className="text-md max-w-lg mr-auto">
+              <p className="mb-2 text-gray-500 font-semibold italic">
+                Dear Wonkypedia visitors,
+              </p>
+              <p className="mb-2 text-justify italic">
+                I humbly ask you to defend Wonkypedia&apos;s independence. It
+                isn&apos;t cheap to beam these articles from a different
+                dimension (use generative ai). If you donate a buck or two it
+                goes a long way to keep the site running.
+              </p>
+
+              <p className="mb-2 font-semibold text-gray-500 italic">
+                Thank you,
+              </p>
+
+              <p className="font-semibold text-gray-500 italic">Sawyer Hood</p>
+            </div>
+            <Image
+              src={logo}
+              alt="Wonkypedia Logo"
+              width={smallW}
+              height={smallH}
+              className="hidden md:block"
+              style={{
+                aspectRatio: `${smallW}/${smallH}`,
+              }}
+            />
+          </div>
+        </Card>
       </div>
     </div>
   );
 }
+
+const logoW = 887;
+const logoH = 750;
+
+const smallW = 887 / 3.5;
+const smallH = 750 / 3.5;

@@ -1,4 +1,4 @@
-import { CHEAP_MODEL, MODEL, openai } from "./client";
+import { CHEAP_MODEL, openai } from "./client";
 
 export async function generateInfobox(
   article: string

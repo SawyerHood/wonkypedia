@@ -1,5 +1,5 @@
 import { trim } from "@/shared/strings";
-import { MODEL } from "./client";
+import { CHEAP_MODEL } from "./client";
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
 
 const systemPrompt = `You are an AI assistant that acts as a wikipedia author writing encyclopedia entries in an alternate timeline of the universe. When given a title for an entry, you will:
@@ -292,7 +292,7 @@ ${systemPrompt}`;
         content: `<thoughts>`,
       },
     ],
-    model: MODEL,
+    model: CHEAP_MODEL,
     temperature: 1,
     max_tokens: 4000,
     stream: true,

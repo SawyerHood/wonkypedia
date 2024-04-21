@@ -31,6 +31,7 @@ export const keyType = pgEnum("key_type", [
   "secretstream",
   "stream_xchacha20",
 ]);
+
 export const factorType = pgEnum("factor_type", ["totp", "webauthn"]);
 export const factorStatus = pgEnum("factor_status", ["unverified", "verified"]);
 export const aalLevel = pgEnum("aal_level", ["aal1", "aal2", "aal3"]);

@@ -37,11 +37,7 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
         ),
         p: ({ children }) => <p className="text-gray mb-4">{children}</p>,
         a: ({ children, href }) => (
-          <Link
-            href={href ?? ""}
-            className="text-blue-500 hover:underline"
-            prefetch={false}
-          >
+          <Link href={href ?? ""} className="text-blue-500 hover:underline">
             {children}
           </Link>
         ),
@@ -70,11 +66,7 @@ export function LinkOnlyRenderer({ markdown }: { markdown: string }) {
     <Markdown
       components={{
         a: ({ children, href }) => (
-          <Link
-            href={href ?? ""}
-            className="text-blue-500 hover:underline"
-            prefetch={false}
-          >
+          <Link href={href ?? ""} className="text-blue-500 hover:underline">
             {children}
           </Link>
         ),

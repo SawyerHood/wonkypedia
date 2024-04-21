@@ -54,7 +54,7 @@ export const extractArticle = (article: string) => {
   return match ? match[1] : null;
 };
 
-export const linkify = (text: string) => {
+export const transformLinks = (text: string) => {
   if (typeof text !== "string") return "";
   return text.replace(
     /\[\[(.*?)(?:\|(.*?))?\]\]/g,
