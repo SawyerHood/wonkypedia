@@ -14,12 +14,21 @@ import { WRITE_TO_DB } from "@/shared/config";
 import { getDb } from "@/db/client";
 import { articles, links } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { auth } from "@/auth";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
   const { title } = await req.json();
+
+  const session = await auth();
+
+  if (!session) {
+    return new Response("Please login to generate an article", {
+      status: 401,
+    });
+  }
 
   const articleStream = await createArticleStream(title);
 
