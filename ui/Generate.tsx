@@ -13,7 +13,7 @@ export default function Generate({ className }: { className?: string }) {
         const formData = new FormData(e.currentTarget);
         const searchQuery = formData.get("search");
         if (typeof searchQuery === "string") {
-          router.push(`/${titleToUri(searchQuery)}`);
+          router.push(`/article/${titleToUri(searchQuery)}`);
         }
       }}
     >
