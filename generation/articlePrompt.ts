@@ -205,57 +205,57 @@ const messages = [
     Perhaps most significantly, the burning of [[fossil fuels]] to power industry and agriculture enabled rapid [[population growth]] and laid the foundation of modern [[consumer culture]]. Yet it also unleashed [[climate change]] and [[environmental degradation]] that still threaten humanity today. Reconciling the material prosperity enabled by industry with its impact on the earth remains an ongoing challenge.
     </article>`,
   },
-  // { role: "user", content: `The Beatles` },
-  // {
-  //   role: "assistant",
-  //   content: trim`<thoughts>
-  //   In this alternate timeline, The Beatles had a different lineup and history from our reality:
-  //   - John Lennon was the only consistent member throughout their career
-  //   - The band had a rotating cast of other musicians, including Eric Clapton for a period
-  //   - They were less commercially successful but were a highly influential avant-garde rock band
-  //   - The band embraced electronica and proto-punk in the early 70s
-  //   - Lennon was shot and killed on stage in 1977, abruptly ending the band
+  { role: "user", content: `The Beatles` },
+  {
+    role: "assistant",
+    content: trim`<thoughts>
+    In this alternate timeline, The Beatles had a different lineup and history from our reality:
+    - John Lennon was the only consistent member throughout their career
+    - The band had a rotating cast of other musicians, including Eric Clapton for a period
+    - They were less commercially successful but were a highly influential avant-garde rock band
+    - The band embraced electronica and proto-punk in the early 70s
+    - Lennon was shot and killed on stage in 1977, abruptly ending the band
 
-  //   Outline:
-  //   1. Formation and early years
-  //   2. Peak of popularity in late 60s
-  //   3. Avant-garde and electronic shift in early 70s
-  //   4. Lennon's murder and end of the band
-  //   5. Legacy and influence
-  //   </thoughts>
+    Outline:
+    1. Formation and early years
+    2. Peak of popularity in late 60s
+    3. Avant-garde and electronic shift in early 70s
+    4. Lennon's murder and end of the band
+    5. Legacy and influence
+    </thoughts>
 
-  //   <summary>
-  //   The Beatles were an English rock band formed in 1960, featuring John Lennon as the primary creative force alongside a frequently changing lineup of musicians. While they found modest chart success in the mid-1960s, the group became known for their increasingly avant-garde musical style in the early 1970s which blended psychedelic rock, electronic experimentation, and aggressive proto-punk. The Beatles' career was cut short when Lennon was shot dead on stage in 1977, but they remain one of the most influential if divisive rock acts of the 20th century.
-  //   </summary>
+    <summary>
+    The Beatles were an English rock band formed in 1960, featuring John Lennon as the primary creative force alongside a frequently changing lineup of musicians. While they found modest chart success in the mid-1960s, the group became known for their increasingly avant-garde musical style in the early 1970s which blended psychedelic rock, electronic experimentation, and aggressive proto-punk. The Beatles' career was cut short when Lennon was shot dead on stage in 1977, but they remain one of the most influential if divisive rock acts of the 20th century.
+    </summary>
 
-  //   <article>
-  //   # The Beatles
+    <article>
+    # The Beatles
 
-  //   The Beatles were an English [[rock music|rock]] band formed in [[Liverpool]] in 1960. The group, whose best-known line-up comprised [[John Lennon]], [[Eric Clapton]], [[Klaus Voormann]], and [[Alan White (drummer)|Alan White]], are regarded as the most influential band of all time. They were integral to the development of [[1960s counterculture]] and popular music's recognition as an [[art form]]. Rooted in [[skiffle]], [[beat music|beat]] and 1950s [[rock and roll]], their sound incorporated elements of [[classical music|classical]], [[traditional pop music|traditional pop]], and [[electronic music|electronic experimentation]].
+    The Beatles were an English [[rock music|rock]] band formed in [[Liverpool]] in 1960. The group, whose best-known line-up comprised [[John Lennon]], [[Eric Clapton]], [[Klaus Voormann]], and [[Alan White (drummer)|Alan White]], are regarded as the most influential band of all time. They were integral to the development of [[1960s counterculture]] and popular music's recognition as an [[art form]]. Rooted in [[skiffle]], [[beat music|beat]] and 1950s [[rock and roll]], their sound incorporated elements of [[classical music|classical]], [[traditional pop music|traditional pop]], and [[electronic music|electronic experimentation]].
 
-  //   ## Formation and early years
-  //   The Beatles began in 1960 as a skiffle and rock and roll group led by John Lennon and featuring a number of schoolmates. The band cycled through drummers and bassists for several years while playing frequently in the [[pub]]s and [[nightclub]]s of Liverpool and [[Hamburg]]. They settled on the lineup of Lennon, guitarist Eric Clapton, bassist Klaus Voormann, and drummer Alan White in early 1964.
+    ## Formation and early years
+    The Beatles began in 1960 as a skiffle and rock and roll group led by John Lennon and featuring a number of schoolmates. The band cycled through drummers and bassists for several years while playing frequently in the [[pub]]s and [[nightclub]]s of Liverpool and [[Hamburg]]. They settled on the lineup of Lennon, guitarist Eric Clapton, bassist Klaus Voormann, and drummer Alan White in early 1964.
 
-  //   Signed to [[Parlophone Records]] by mid-1964, the band quickly gained popularity in the [[United Kingdom|UK]] with a string of catchy singles blending rock and pop sounds like "Love to Hold Your Mind", "With a Little Luck", and "Hey Go Round." Lennon and Clapton became known for their inventive [[guitar]] interplay and [[songwriting]] partnership.
+    Signed to [[Parlophone Records]] by mid-1964, the band quickly gained popularity in the [[United Kingdom|UK]] with a string of catchy singles blending rock and pop sounds like "Love to Hold Your Mind", "With a Little Luck", and "Hey Go Round." Lennon and Clapton became known for their inventive [[guitar]] interplay and [[songwriting]] partnership.
 
-  //   ## Peak of popularity
-  //   In the latter half of the 1960s, The Beatles released a string of groundbreaking albums that expanded the scope of rock music: 1966's ''Kaleidoscope Eyes'', 1967's ''Beyond the Horizon'', and 1968's [[The Beatles (album)|self-titled album]] (commonly known as the "Black Album" due to its cover art). These records featured complex songwriting, unorthodox structures, philosophical lyrics, and elements of [[psychedelic rock]], [[Indian classical music]], and [[electroacoustic music]]. Hits from this period like "A Better View", "Your Inside World", and "Not Too Far" showcased the band's evolution.
+    ## Peak of popularity
+    In the latter half of the 1960s, The Beatles released a string of groundbreaking albums that expanded the scope of rock music: 1966's ''Kaleidoscope Eyes'', 1967's ''Beyond the Horizon'', and 1968's [[The Beatles (album)|self-titled album]] (commonly known as the "Black Album" due to its cover art). These records featured complex songwriting, unorthodox structures, philosophical lyrics, and elements of [[psychedelic rock]], [[Indian classical music]], and [[electroacoustic music]]. Hits from this period like "A Better View", "Your Inside World", and "Not Too Far" showcased the band's evolution.
 
-  //   The Beatles' fame hit a fever pitch in 1967–1968. They were regarded as leaders of the nascent counterculture's "New Awakening," and their music was seen as revolutionary. Lennon in particular became an icon for the [[hippie]] movement and [[student activism|student activists]]. However, the band began to retreat from the intensity of [[Beatlemania]] and stopped touring, focusing on increasingly experimental studio recordings.
+    The Beatles' fame hit a fever pitch in 1967–1968. They were regarded as leaders of the nascent counterculture's "New Awakening," and their music was seen as revolutionary. Lennon in particular became an icon for the [[hippie]] movement and [[student activism|student activists]]. However, the band began to retreat from the intensity of [[Beatlemania]] and stopped touring, focusing on increasingly experimental studio recordings.
 
-  //   ## Avant-garde period
-  //   As they entered the 1970s, The Beatles began a dramatic musical shift, growing heavily influenced by the emerging [[krautrock]] and electronic music scenes as well as the aggressive rock of artists like [[Iggy Pop]]. Their untitled 1971 double album (dubbed "The Primal Record" by fans) featured side-long [[tape manipulation]]s, discordant [[noise rock]], and enigmatic spoken-word passages. It divided listeners but spawned imitators in the [[underground music]] scene.
+    ## Avant-garde period
+    As they entered the 1970s, The Beatles began a dramatic musical shift, growing heavily influenced by the emerging [[krautrock]] and electronic music scenes as well as the aggressive rock of artists like [[Iggy Pop]]. Their untitled 1971 double album (dubbed "The Primal Record" by fans) featured side-long [[tape manipulation]]s, discordant [[noise rock]], and enigmatic spoken-word passages. It divided listeners but spawned imitators in the [[underground music]] scene.
 
-  //   Subsequent releases like 1973's ''Chrome Ego'' and 1975's ''Neuromancer'' ventured further into [[avant-garde music|avant-garde]], electronic, and early [[punk rock|punk]] sounds. Lennon and Clapton began incorporating political themes into abstract, poetic lyrics. While the band remained a [[cult following|cult favorite]], their experimentation alienated much of their mainstream audience from the 1960s. Lineup changes also became frequent again, with a number of musicians cycling through the band.
+    Subsequent releases like 1973's ''Chrome Ego'' and 1975's ''Neuromancer'' ventured further into [[avant-garde music|avant-garde]], electronic, and early [[punk rock|punk]] sounds. Lennon and Clapton began incorporating political themes into abstract, poetic lyrics. While the band remained a [[cult following|cult favorite]], their experimentation alienated much of their mainstream audience from the 1960s. Lineup changes also became frequent again, with a number of musicians cycling through the band.
 
-  //   ## Dissolution and legacy
-  //   The Beatles continued as a rotating musical collective centered around Lennon and Clapton until 1977, when Lennon was infamously murdered on stage during a concert in [[Los Angeles]]. Devastated, Clapton and the other members disbanded the group and went their separate ways. All four Beatles went on to successful [[solo artist|solo careers]] but never played together again.
+    ## Dissolution and legacy
+    The Beatles continued as a rotating musical collective centered around Lennon and Clapton until 1977, when Lennon was infamously murdered on stage during a concert in [[Los Angeles]]. Devastated, Clapton and the other members disbanded the group and went their separate ways. All four Beatles went on to successful [[solo artist|solo careers]] but never played together again.
 
-  //   Despite (or perhaps because of) their uncompromising later years, The Beatles are remembered as one of the 20th century's most groundbreaking musical acts. Their 1960s work was crucial in establishing rock as a serious art form capable of sonic exploration and poetic expression. And their electronic experiments and abrasive proto-punk in the early 1970s, while polarizing at the time, have been heavily influential on subsequent generations of [[indie rock|indie]] and avant-garde musicians.
+    Despite (or perhaps because of) their uncompromising later years, The Beatles are remembered as one of the 20th century's most groundbreaking musical acts. Their 1960s work was crucial in establishing rock as a serious art form capable of sonic exploration and poetic expression. And their electronic experiments and abrasive proto-punk in the early 1970s, while polarizing at the time, have been heavily influential on subsequent generations of [[indie rock|indie]] and avant-garde musicians.
 
-  //   Reappraisals of the band's work continue to this day - the "Black Album" was inducted into the [[Grammy Hall of Fame]] in 1992, and 2006's ''The Beatles Reconsidered'' positioned their 1970s records as an innovative bridge between rock and the burgeoning [[electronic music|electronic]], [[noise music|noise]] and [[industrial music|industrial]] genres. [[Outtake]]s, [[demo]]s, and [[live album|live recordings]] from throughout their career continue to be reissued to eager collectors and completionists. The Beatles' turbulent history and ever-shifting style virtually guaranteed that they will remain objects of fascination, scrutiny and inspiration for generations to come.
-  //   </article>`,
-  // },
+    Reappraisals of the band's work continue to this day - the "Black Album" was inducted into the [[Grammy Hall of Fame]] in 1992, and 2006's ''The Beatles Reconsidered'' positioned their 1970s records as an innovative bridge between rock and the burgeoning [[electronic music|electronic]], [[noise music|noise]] and [[industrial music|industrial]] genres. [[Outtake]]s, [[demo]]s, and [[live album|live recordings]] from throughout their career continue to be reissued to eager collectors and completionists. The Beatles' turbulent history and ever-shifting style virtually guaranteed that they will remain objects of fascination, scrutiny and inspiration for generations to come.
+    </article>`,
+  },
 ] as const;
 
 export function getMessageCreateParams(
