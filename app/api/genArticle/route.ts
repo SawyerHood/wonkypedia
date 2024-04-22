@@ -6,7 +6,6 @@ import {
 } from "@/shared/articleUtils";
 import { revalidatePath } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
-import { genAndUploadImage } from "@/generation/image";
 import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
 import { ChatCompletionCreateParamsStreaming } from "openai/resources/index.mjs";
@@ -228,6 +227,7 @@ async function createArticleStream(title: string) {
   console.log(contextArticles);
 
   const params = getMessageCreateParams(title, contextArticles);
+  console.log(params);
 
   console.log("Before stream");
   // Ask Claude for a streaming chat completion given the prompt

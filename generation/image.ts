@@ -1,4 +1,4 @@
-import { supabaseServiceClient } from "@/db/service";
+import { put } from "@vercel/blob";
 
 export async function genCloudflareImage(prompt: string): Promise<Blob> {
   const options = {
@@ -55,29 +55,13 @@ async function genFireworksImage(prompt: string): Promise<Blob> {
 const genImageBlob = genFireworksImage;
 
 export async function genAndUploadImage(prompt: string) {
-  console.log("genAndUploadImage");
   const key = crypto.randomUUID();
 
-  let start = Date.now();
-  console.log("start genImageBlob");
   const blob = await genImageBlob(prompt);
-  console.log("end genImageBlob: ", Date.now() - start);
 
-  start = Date.now();
-  console.log("start upload");
-  const { data: _, error } = await supabaseServiceClient.storage
-    .from("images")
-    .upload(`${key}.jpg`, blob);
-  console.log("end upload: ", Date.now() - start);
+  const res = await put(`images/${key}.jpg`, blob, {
+    access: "public",
+  });
 
-  if (error) {
-    console.error(error);
-  }
-  const { data } = await supabaseServiceClient.storage
-    .from("images")
-    .getPublicUrl(`${key}.jpg`);
-
-  console.log("imageData", data);
-
-  return data.publicUrl;
+  return res.url;
 }

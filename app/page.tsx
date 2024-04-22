@@ -5,14 +5,15 @@ import logo from "./icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/ui/Card";
+import { head } from "@vercel/blob";
 
 export const revalidate = 60 * 60;
 
-const jsonURL =
-  "https://sfozpnhknzamtdqmmjtl.supabase.co/storage/v1/object/public/homepage/homepage.json";
-
 export default async function Home() {
-  const resp = await fetch(jsonURL, { next: { revalidate: 60 * 60 } });
+  const res = await head(
+    "https://mynvsgmvogwjsrrm.public.blob.vercel-storage.com/homepage-8WpErsUiPKYjPijggmMRR5D7OViyqO.json"
+  );
+  const resp = await fetch(res.url, { next: { revalidate: 60 * 60 } });
   const data = await resp.blob();
 
   const homepageInfo: {

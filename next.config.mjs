@@ -14,6 +14,9 @@ const nextConfig = {
       {
         hostname: "sfozpnhknzamtdqmmjtl.supabase.co",
       },
+      {
+        hostname: "mynvsgmvogwjsrrm.public.blob.vercel-storage.com",
+      },
     ],
   },
 };

@@ -18,6 +18,7 @@
     "@supabase/supabase-js": "^2.42.0",
     "@types/better-sqlite3": "^7.6.9",
     "@types/throttle-debounce": "^5.0.2",
+    "@vercel/blob": "^0.23.2",
     "@vercel/postgres": "^0.8.0",
     "classnames": "^2.5.1",
     "drizzle-orm": "^0.30.8",

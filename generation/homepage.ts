@@ -4,7 +4,7 @@ import { desc, eq, isNotNull, sql } from "drizzle-orm";
 import { articles } from "@/drizzle/schema";
 import { fileURLToPath } from "url";
 import { linkify } from "./linkify";
-import { supabaseServiceClient } from "@/db/service";
+import { put } from "@vercel/blob";
 
 const summaryPrompt = `You are a master wikipedia contributor. You will be given an article and write a small two paragraph summary of the article to put on the homepage. Return only the summary as markdown. Do not include a header`;
 
@@ -38,7 +38,19 @@ async function generateSummary(
   };
 }
 
-const didYouKnowPrompt = `You are a master wikipedia contributor. You will be given 10 articles. Write a bulleted list of 5 "did you know" facts about the articles. Return only the facts as a markdown bulleted list. Return only the list.`;
+const didYouKnowPrompt = `You are a master wikipedia contributor in another dimension that is different than our own. You will be given 10 articles from the other dimension. Create a list of 5 did you know facts using only information from the articles. 
+
+<format>
+Write a bulleted list of 5 "did you know" facts about the articles. Return only the facts as a markdown bulleted list. Return only the list.
+</format>
+<example-output>
+- Did you know that honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still edible.
+- Did you know that octopuses have three hearts? Two pump blood to the gills, while the third pumps it to the rest of the body.
+- Did you know that the shortest war in history was between Britain and Zanzibar on August 27, 1896? Zanzibar surrendered after 38 minutes.
+- Did you know that the Eiffel Tower can be 15 cm taller during the summer? When the temperature increases, the metal expands, which increases the height of the tower.
+- Did you know that the total weight of ants on earth once equaled the total weight of people? Scientists estimate that for every person on Earth, there are about 1.6 million ants.
+</example-output>
+`;
 
 async function generateDidYouKnow(): Promise<{ text: string; image: string }> {
   const db = getDb();
@@ -122,21 +134,18 @@ async function uploadHomepage(homepage: {
   didYouKnow: string | null;
   didYouKnowImage: string | null;
 }) {
-  const { data, error } = await supabaseServiceClient.storage
-    .from("homepage")
-    .update("homepage.json", JSON.stringify(homepage));
+  const res = await put("homepage.json", JSON.stringify(homepage), {
+    access: "public",
+  });
 
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  return res.url;
 }
 
 export async function generateAndUploadHomepage() {
   const homepage = await generateHomepage();
-  console.log(homepage);
-  await uploadHomepage(homepage);
+  const url = await uploadHomepage(homepage);
+  console.log(url);
+  return homepage;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
