@@ -105,7 +105,7 @@ export default async function Home() {
               <p className="mb-2 text-justify italic">
                 I humbly ask you to defend Wonkypedia&apos;s independence. It
                 isn&apos;t cheap to beam these articles from a different
-                dimension (use generative ai). If you donate a buck or two it
+                dimension (using generative AI). If you donate a buck or two, it
                 goes a long way to keep the site running.
               </p>
 
