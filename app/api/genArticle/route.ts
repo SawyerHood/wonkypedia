@@ -58,12 +58,21 @@ export async function POST(req: Request) {
           );
 
           if (infoBox.imageDescription) {
-            const image = await genAndUploadImage(infoBox.imageDescription);
-            await saveImageToDatabase(title, image);
+            // const image = await genAndUploadImage(infoBox.imageDescription);
+            console.log(`${req.headers.get("origin")}/api/genImage`);
+            const imageRequest = await fetch(
+              `${req.headers.get("origin")}/api/genImage`,
+              {
+                method: "POST",
+                body: JSON.stringify({ prompt: infoBox.imageDescription }),
+              }
+            );
+            const image = await imageRequest.json();
+            await saveImageToDatabase(title, image.url);
             controller.enqueue(
               encodeMessage({
                 type: "image",
-                value: image,
+                value: image.url,
               })
             );
           }
