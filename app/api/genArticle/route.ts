@@ -16,7 +16,8 @@ import { articles, links } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
+export const maxDuration = 25;
 
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
