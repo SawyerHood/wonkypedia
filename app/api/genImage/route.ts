@@ -1,6 +1,6 @@
 import { genAndUploadImage } from "@/generation/image";
 
-export const runtime = "node";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
