@@ -2,6 +2,7 @@ import { getDb } from "@/db/client";
 import { titleToUri, uriToTitle } from "@/shared/articleUtils";
 import { sql } from "drizzle-orm";
 import Link from "next/link";
+import { Suspense } from "react";
 import { remark } from "remark";
 import strip from "strip-markdown";
 
@@ -11,19 +12,6 @@ export default async function SearchPage({
   searchParams: { [key: string]: string };
 }) {
   const param = uriToTitle(searchParams.q);
-  const db = getDb();
-  const query = sql`
-  select
-    title, content
-  from
-    articles
-  where
-    to_tsvector(content || ' ' || title) -- concat columns, but be sure to include a space to separate them!
-  @@ websearch_to_tsquery(${param});`;
-
-  const results = await db.execute(query);
-
-  const rows = results.rows as { title: string; content: string }[];
 
   return (
     <div className="flex flex-col p-4">
@@ -40,50 +28,76 @@ export default async function SearchPage({
           </button>
         </Link>
       </div>
-      {rows.map(
-        ({
-          title,
-          content: rawContent,
-        }: {
-          title: string;
-          content: string;
-        }) => {
-          const content = remark()
-            .use(strip)
-            .processSync(rawContent.replace(/\[\[(.*?)\]\]/g, "$1"))
-            .toString();
-          const matchingContent =
-            getMatchingContent(content, param) ??
-            `${content.substring(0, 150)}...`;
+      <Suspense fallback={<SearchResultSkeleton />}>
+        <SearchResults param={param} />
+      </Suspense>
+    </div>
+  );
+}
 
-          const highlightedContent = matchingContent
-            .split(new RegExp(`(${param})`, "gi"))
-            .map((part, index) =>
-              part.toLowerCase() === param.toLowerCase() ? (
-                <span key={index} className="bg-yellow-200">
-                  {part}
-                </span>
-              ) : (
-                part
-              )
-            );
+async function SearchResults({ param }: { param: string }) {
+  const db = getDb();
+  const query = sql`
+  select
+    title, content
+  from
+    articles
+  where
+    to_tsvector(content || ' ' || title) -- concat columns, but be sure to include a space to separate them!
+  @@ websearch_to_tsquery(${param});`;
 
-          return (
-            <div
-              key={title}
-              className="p-4 my-2 mx-auto bg-white rounded shadow overflow-hidden max-w-full md:max-w-2xl w-full"
-            >
-              <a
-                href={`/article/${title}`}
-                className="no-underline hover:underline text-blue-500"
-              >
-                <h2 className="text-lg font-medium">{title}</h2>
-              </a>
-              <p className="text-gray-600">{highlightedContent}</p>
-            </div>
-          );
-        }
-      )}
+  const results = await db.execute(query);
+
+  const rows = results.rows as { title: string; content: string }[];
+
+  return rows.map(
+    ({ title, content: rawContent }: { title: string; content: string }) => {
+      const content = remark()
+        .use(strip)
+        .processSync(rawContent.replace(/\[\[(.*?)\]\]/g, "$1"))
+        .toString();
+      const matchingContent =
+        getMatchingContent(content, param) ?? `${content.substring(0, 150)}...`;
+
+      const highlightedContent = matchingContent
+        .split(new RegExp(`(${param})`, "gi"))
+        .map((part, index) =>
+          part.toLowerCase() === param.toLowerCase() ? (
+            <span key={index} className="bg-yellow-200">
+              {part}
+            </span>
+          ) : (
+            part
+          )
+        );
+
+      return (
+        <div
+          key={title}
+          className="p-4 my-2 mx-auto bg-white rounded shadow overflow-hidden max-w-full md:max-w-2xl w-full"
+        >
+          <a
+            href={`/article/${title}`}
+            className="no-underline hover:underline text-blue-500"
+          >
+            <h2 className="text-lg font-medium">{title}</h2>
+          </a>
+          <p className="text-gray-600">{highlightedContent}</p>
+        </div>
+      );
+    }
+  );
+}
+
+export function SearchResultSkeleton() {
+  return (
+    <div className="animate-pulse p-4 my-2 mx-auto bg-white rounded shadow overflow-hidden max-w-full md:max-w-2xl w-full">
+      <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
+      <div className="space-y-4">
+        <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+      </div>
     </div>
   );
 }
