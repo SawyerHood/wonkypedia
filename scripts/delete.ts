@@ -4,4 +4,7 @@ import { eq } from "drizzle-orm";
 
 const db = getDb();
 
-await db.delete(articles).where(eq(articles.title, "Swift-boyce"));
+async function deleteArticle() {
+  await db.delete(articles).where(eq(articles.title, "Swift-boyce"));
+}
+deleteArticle();
