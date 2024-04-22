@@ -1,11 +1,10 @@
-import { VercelPgDatabase, drizzle } from "drizzle-orm/vercel-postgres";
 import * as schema from "@/drizzle/schema";
-import { sql } from "@vercel/postgres";
+import { Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
 
-const dbInstance: VercelPgDatabase<typeof schema> = drizzle(sql, {
-  schema,
-});
+const pool = new Pool({ connectionString: process.env.POSTGRES_URL! });
+export const db = drizzle(pool, { schema });
 
 export const getDb = () => {
-  return dbInstance;
+  return db;
 };

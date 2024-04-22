@@ -60,6 +60,7 @@ export async function POST(req: Request) {
           if (infoBox.imageDescription) {
             // const image = await genAndUploadImage(infoBox.imageDescription);
             console.log(`${req.headers.get("origin")}/api/genImage`);
+            console.log("fetching image");
             const imageRequest = await fetch(
               `${req.headers.get("origin")}/api/genImage`,
               {
