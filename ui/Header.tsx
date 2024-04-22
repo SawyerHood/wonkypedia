@@ -18,7 +18,7 @@ const Header = async () => {
             Wonkypedia
           </span>
         </Link>
-        <Search className="col-span-6 hidden md:flex" />
+        <Search className="col-span-9 row-start-2 md:col-span-6 flex md:row-start-1 md:col-start-4" />
         <form
           className="col-span-6 md:col-span-3 flex justify-end"
           action={async () => {
