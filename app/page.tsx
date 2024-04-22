@@ -86,7 +86,7 @@ export default async function Home() {
                 alt="Sawyer Hood"
                 width={200}
                 height={200}
-                className="aspect-square max-w-[200px] max-h-[200px]"
+                className="aspect-square max-w-[200px] max-h-[200px] filter grayscale"
               />
               <a
                 href="https://www.buymeacoffee.com/sawyerhood"
@@ -135,5 +135,5 @@ export default async function Home() {
 const logoW = 887;
 const logoH = 750;
 
-const smallW = 887 / 3.5;
-const smallH = 750 / 3.5;
+const smallW = logoW / 3.5;
+const smallH = logoH / 3.5;
