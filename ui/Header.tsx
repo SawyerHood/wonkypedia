@@ -3,7 +3,7 @@ import { auth, signIn, signOut } from "@/auth";
 import Image from "next/image";
 import logo from "@/assets/wonkypedia.png";
 import Link from "next/link";
-import Generate from "./Generate";
+import Search from "./Search";
 import { Grid } from "./Grid";
 import { GoogleButton } from "./GoogleButton";
 
@@ -18,7 +18,7 @@ const Header = async () => {
             Wonkypedia
           </span>
         </Link>
-        <Generate className="col-span-6 hidden md:flex" />
+        <Search className="col-span-6 hidden md:flex" />
         <form
           className="col-span-6 md:col-span-3 flex justify-end"
           action={async () => {

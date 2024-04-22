@@ -3,7 +3,7 @@
 import { titleToUri } from "@/shared/articleUtils";
 import { useRouter } from "next/navigation";
 
-export default function Generate({ className }: { className?: string }) {
+export default function Search({ className }: { className?: string }) {
   const router = useRouter();
   return (
     <form
@@ -13,19 +13,19 @@ export default function Generate({ className }: { className?: string }) {
         const formData = new FormData(e.currentTarget);
         const searchQuery = formData.get("search");
         if (typeof searchQuery === "string") {
-          router.push(`/article/${titleToUri(searchQuery)}`);
+          router.push(`/search?q=${titleToUri(searchQuery)}`);
         }
       }}
     >
       <input
         name="search"
         type="text"
-        placeholder="What do you want to create?"
+        placeholder="What are you looking for?"
         className="flex-grow p-2"
         autoComplete="off"
       />
       <button type="submit" className="p-2 bg-gray-200">
-        Create
+        Search
       </button>
     </form>
   );
