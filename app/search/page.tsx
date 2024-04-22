@@ -89,7 +89,7 @@ async function SearchResults({ param }: { param: string }) {
   );
 }
 
-export function SearchResultSkeleton() {
+function SearchResultSkeleton() {
   return (
     <div className="animate-pulse p-4 my-2 mx-auto bg-white rounded shadow overflow-hidden max-w-full md:max-w-2xl w-full">
       <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
