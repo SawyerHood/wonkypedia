@@ -33,7 +33,7 @@ export default async function Home() {
         >
           <p>
             Wonkypedia is a free encyclopedia for an alternative universe. It is
-            for those who love going down wiki rabbit holes, but are tired of
+            for those who love going down wiki rabbit holes but are tired of
             doing learning about real things. As you click between links,
             articles are generated on the fly, building out a shared universe.
           </p>
