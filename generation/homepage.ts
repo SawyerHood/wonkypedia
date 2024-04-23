@@ -2,9 +2,7 @@ import { getDb } from "@/db/client";
 import { CHEAP_MODEL, openai } from "./client";
 import { desc, eq, isNotNull, sql } from "drizzle-orm";
 import { articles } from "@/drizzle/schema";
-import { fileURLToPath } from "url";
 import { linkify } from "./linkify";
-import { put } from "@vercel/blob";
 
 const summaryPrompt = `You are a master wikipedia contributor. You will be given an article and write a small two paragraph summary of the article to put on the homepage. Return only the summary as markdown. Do not include a header`;
 
@@ -126,37 +124,4 @@ export async function generateHomepage(): Promise<{
     didYouKnow: didYouKnow.text,
     didYouKnowImage: didYouKnow.image,
   };
-}
-
-async function uploadHomepage(homepage: {
-  summary: string | null;
-  summaryImage: string | null;
-  didYouKnow: string | null;
-  didYouKnowImage: string | null;
-}) {
-  const res = await put("homepage.json", JSON.stringify(homepage), {
-    access: "public",
-  });
-
-  return res.url;
-}
-
-export async function generateAndUploadHomepage() {
-  const homepage = await generateHomepage();
-  const url = await uploadHomepage(homepage);
-  console.log(url);
-  return homepage;
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  generateAndUploadHomepage()
-    .then((homepage) => {
-      console.log(JSON.stringify(homepage, null, 2));
-    })
-    .catch((error) => {
-      console.error("Error generating homepage:", error);
-    })
-    .finally(() => {
-      process.exit(0);
-    });
 }

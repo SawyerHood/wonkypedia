@@ -5,15 +5,20 @@ import logo from "./icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/ui/Card";
+import { headers } from "next/headers";
 
 export const revalidate = 60 * 60;
 
-const jsonURL =
-  "https://mynvsgmvogwjsrrm.public.blob.vercel-storage.com/homepage-HXlxvft0qhKSBAvKCiZMxOWneWhOID.json";
-
 export default async function Home() {
-  const resp = await fetch(jsonURL, { next: { revalidate: 60 * 60 } });
-  const data = await resp.blob();
+  const origin = headers().get("origin") ?? headers().get("host");
+  const baseURL = `${
+    origin?.startsWith("localhost") ? "http" : "https"
+  }://${origin}`;
+
+  const resp = await fetch(`${baseURL}/api/homepage`, {
+    next: { revalidate: 60 * 60 },
+  });
+  const data = await resp.json();
 
   const homepageInfo: {
     summary: string;
@@ -21,7 +26,7 @@ export default async function Home() {
     summaryTitle: string;
     didYouKnow: string;
     didYouKnowImage: string;
-  } = JSON.parse(await data.text());
+  } = data;
 
   return (
     <div className="max-w-screen-lg mx-auto p-4 flex flex-col items-center min-w-min">
