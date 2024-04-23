@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/genHomePage",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}
