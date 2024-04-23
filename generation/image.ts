@@ -52,7 +52,7 @@ async function genFireworksImage(prompt: string): Promise<Blob> {
   return blob;
 }
 
-const genImageBlob = genFireworksImage;
+const genImageBlob = genCloudflareImage;
 
 export async function genAndUploadImage(prompt: string) {
   const key = crypto.randomUUID();
