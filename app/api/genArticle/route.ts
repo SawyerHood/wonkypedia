@@ -68,13 +68,15 @@ export async function POST(req: Request) {
               }
             );
             const image = await imageRequest.json();
-            await saveImageToDatabase(title, image.url);
-            controller.enqueue(
-              encodeMessage({
-                type: "image",
-                value: image.url,
-              })
-            );
+            if (image.url) {
+              await saveImageToDatabase(title, image.url);
+              controller.enqueue(
+                encodeMessage({
+                  type: "image",
+                  value: image.url,
+                })
+              );
+            }
           }
         }
 

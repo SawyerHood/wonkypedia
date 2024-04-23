@@ -1,6 +1,6 @@
 import { put } from "@vercel/blob";
 
-export async function genCloudflareImage(prompt: string): Promise<Blob> {
+export async function genCloudflareImage(prompt: string): Promise<Blob | null> {
   const options = {
     method: "POST",
     headers: {
@@ -19,6 +19,7 @@ export async function genCloudflareImage(prompt: string): Promise<Blob> {
   if (!resp.ok) {
     console.error("Error generating image", await resp.text());
     console.error("resp", resp);
+    return null;
   }
 
   return await resp.blob();
@@ -58,6 +59,10 @@ export async function genAndUploadImage(prompt: string) {
   const key = crypto.randomUUID();
 
   const blob = await genImageBlob(prompt);
+
+  if (!blob) {
+    return null;
+  }
 
   const res = await put(`images/${key}.jpg`, blob, {
     access: "public",
