@@ -1,10 +1,9 @@
 import { getDb } from "@/db/client";
-import { titleToUri, uriToTitle } from "@/shared/articleUtils";
+import { stripMarkdown, titleToUri, uriToTitle } from "@/shared/articleUtils";
+import { ArticleCard } from "@/ui/ArticleCard";
 import { sql } from "drizzle-orm";
 import Link from "next/link";
 import { Suspense } from "react";
-import { remark } from "remark";
-import strip from "strip-markdown";
 
 export default async function SearchPage({
   searchParams,
@@ -52,10 +51,7 @@ async function SearchResults({ param }: { param: string }) {
 
   return rows.map(
     ({ title, content: rawContent }: { title: string; content: string }) => {
-      const content = remark()
-        .use(strip)
-        .processSync(rawContent.replace(/\[\[(.*?)\]\]/g, "$1"))
-        .toString();
+      const content = stripMarkdown(rawContent);
       const matchingContent =
         getMatchingContent(content, param) ?? `${content.substring(0, 150)}...`;
 
@@ -72,18 +68,7 @@ async function SearchResults({ param }: { param: string }) {
         );
 
       return (
-        <div
-          key={title}
-          className="p-4 my-2 mx-auto bg-white rounded shadow overflow-hidden max-w-full md:max-w-2xl w-full"
-        >
-          <a
-            href={`/article/${title}`}
-            className="no-underline hover:underline text-blue-500"
-          >
-            <h2 className="text-lg font-medium">{title}</h2>
-          </a>
-          <p className="text-gray-600">{highlightedContent}</p>
-        </div>
+        <ArticleCard key={title} title={title} content={highlightedContent} />
       );
     }
   );

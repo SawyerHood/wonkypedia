@@ -32,11 +32,14 @@ export default async function Home() {
           title="What is Wonkypedia?"
           className="col-start-1"
         >
-          <p>
+          <p className="mb-4">
             Wonkypedia is a free encyclopedia for an alternative universe. It is
             for those who have exhausted the rabbit holes of Wikipedia and want
             to dive into an alternate timeline.
           </p>
+          <Link href="/browse" className="text-blue-500 hover:underline">
+            Browse New Articles...
+          </Link>
         </Card>
         <Card
           colorScheme="blue"

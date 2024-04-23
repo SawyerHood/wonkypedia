@@ -1,3 +1,6 @@
+import { remark } from "remark";
+import strip from "strip-markdown";
+
 export const toTitleCase = (str: string) => {
   return str.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
@@ -72,4 +75,11 @@ export function slugify(text: string) {
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9]/g, "");
+}
+
+export function stripMarkdown(text: string) {
+  return remark()
+    .use(strip)
+    .processSync(text.replace(/\[\[(.*?)\]\]/g, "$1"))
+    .toString();
 }
