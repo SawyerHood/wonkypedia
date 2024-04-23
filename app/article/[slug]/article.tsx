@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -12,6 +11,7 @@ import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
 import { Grid } from "@/ui/Grid";
+import Image from "next/image";
 
 export default function Article({
   title,
@@ -219,7 +219,13 @@ function Infobox({
     <div className="bg-gray-100 p-4 rounded-lg">
       <h2 className="text-lg font-bold mb-2">{title}</h2>
       {imgUrl && (
-        <img src={imgUrl} alt={title} className="mb-4 w-full aspect-square" />
+        <Image
+          src={imgUrl}
+          alt={title}
+          className="mb-4 w-full aspect-square"
+          width={256}
+          height={256}
+        />
       )}
       {!imgUrl && isLoading && (
         <div className="animate-pulse bg-gray-300 w-full aspect-square mb-4"></div>
