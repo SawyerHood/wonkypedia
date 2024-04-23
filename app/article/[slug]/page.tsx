@@ -1,10 +1,8 @@
 import Article from "./article";
 import { uriToTitle } from "@/shared/articleUtils";
-import { getDb } from "@/db/client";
-import { articles } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { LoginBlock } from "@/ui/LoginBlock";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -20,26 +18,33 @@ export async function generateMetadata({
   };
 }
 
-const loadArticle = async (title: string) => {
-  const db = getDb();
-  const article = await db
-    .select()
-    .from(articles)
-    .where(eq(articles.title, title))
-    .execute();
-  return article;
-};
-
 export default async function Page({ params }: { params: { slug: string } }) {
   const title = uriToTitle(params.slug);
   const session = await auth();
-  const article = await loadArticle(title);
+  const origin = headers().get("origin") ?? headers().get("host");
+
+  const resp = await fetch(
+    `${
+      origin?.startsWith("localhost") ? "http" : "https"
+    }://${origin}/api/article?title=${title}`,
+    {
+      next: {
+        tags: [title],
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const article = resp.ok ? await resp.json() : null;
+  console.log("hello");
+  console.log(article);
 
   return (
     <Article
       title={title}
-      article={article?.[0] ?? null}
-      session={session}
+      article={article}
+      isLoggedIn={!!session}
       loginSection={<LoginBlock />}
     />
   );

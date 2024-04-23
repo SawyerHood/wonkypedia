@@ -4,7 +4,7 @@ import {
   createMarkdown,
   extractArticle,
 } from "@/shared/articleUtils";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
@@ -129,8 +129,7 @@ async function saveToDatabase(title: string, content: string) {
   const links = collectAllLinksFromString(markdown);
 
   await saveLinksToDatabase(title, links);
-
-  revalidatePath("/" + encodeURIComponent(title));
+  revalidateTag(title);
 }
 
 function getAllLinksFromInfobox(infobox: Object, links: string[] = []) {
@@ -181,6 +180,8 @@ async function saveImageToDatabase(title: string, image: string) {
         imageUrl: image,
       },
     });
+
+  revalidateTag(title);
 }
 
 async function saveLinksToDatabase(title: string, newLinks: string[]) {
@@ -204,7 +205,7 @@ async function saveLinksToDatabase(title: string, newLinks: string[]) {
 async function createArticleStream(title: string) {
   const db = getDb();
   const existingArticleCheck = await db
-    .select()
+    .select({ title: articles.title })
     .from(articles)
     .where(eq(articles.title, title));
 

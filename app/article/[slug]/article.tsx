@@ -12,12 +12,11 @@ import MarkdownRenderer, { LinkOnlyRenderer } from "@/ui/MarkdownRenderer";
 import { decodeChunk } from "@/shared/encoding";
 import { throttle } from "throttle-debounce";
 import { Grid } from "@/ui/Grid";
-import { Session } from "next-auth";
 
 export default function Article({
   title,
   article,
-  session,
+  isLoggedIn,
   loginSection,
 }: {
   title: string;
@@ -28,10 +27,10 @@ export default function Article({
     imageUrl: string | null;
     infobox: unknown;
   } | null;
-  session: Session | null;
+  isLoggedIn: boolean;
   loginSection: React.ReactNode;
 }) {
-  const isGenerating = !article && !!session;
+  const isGenerating = !article && isLoggedIn;
   const {
     article: streamedResponse,
     infobox: streamedInfoBox,
@@ -39,7 +38,7 @@ export default function Article({
     isLoading,
   } = useGeneratedArticle(title, isGenerating);
 
-  const needsLogin = !session && !article;
+  const needsLogin = !isLoggedIn && !article;
 
   const infobox = article?.infobox ?? streamedInfoBox;
   const imgUrl = article?.imageUrl ?? streamedImgUrl;

@@ -5,7 +5,6 @@ import logo from "./icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/ui/Card";
-import { head } from "@vercel/blob";
 
 export const revalidate = 60 * 60;
 
