@@ -9,11 +9,11 @@ import { head } from "@vercel/blob";
 
 export const revalidate = 60 * 60;
 
+const jsonURL =
+  "https://mynvsgmvogwjsrrm.public.blob.vercel-storage.com/homepage-HXlxvft0qhKSBAvKCiZMxOWneWhOID.json";
+
 export default async function Home() {
-  const res = await head(
-    "https://mynvsgmvogwjsrrm.public.blob.vercel-storage.com/homepage-8WpErsUiPKYjPijggmMRR5D7OViyqO.json"
-  );
-  const resp = await fetch(res.url, { next: { revalidate: 60 * 60 } });
+  const resp = await fetch(jsonURL, { next: { revalidate: 60 * 60 } });
   const data = await resp.blob();
 
   const homepageInfo: {
