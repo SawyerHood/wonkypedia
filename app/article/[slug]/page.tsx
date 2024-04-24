@@ -22,7 +22,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
   const title = uriToTitle(params.slug);
   const session = await auth();
   const origin = headers().get("origin") ?? headers().get("host");
-
   const resp = await fetch(
     `${
       origin?.startsWith("localhost") ? "http" : "https"
@@ -37,8 +36,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
     }
   );
   const article = resp.ok ? await resp.json() : null;
-  console.log("hello");
-  console.log(article);
 
   return (
     <Article
