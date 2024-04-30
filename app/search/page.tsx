@@ -1,5 +1,6 @@
 import { getDb } from "@/db/client";
 import { stripMarkdown, titleToUri, uriToTitle } from "@/shared/articleUtils";
+import { IS_LOCAL } from "@/shared/config";
 import { ArticleCard } from "@/ui/ArticleCard";
 import { sql } from "drizzle-orm";
 import Link from "next/link";
@@ -36,6 +37,9 @@ export default async function SearchPage({
 
 async function SearchResults({ param }: { param: string }) {
   const db = getDb();
+
+  // This is pretty slow, we should pre compute this column and store it in the database, but this is fine
+  // for a few thousand articles.
   const query = sql`
   select
     title, content
@@ -47,7 +51,9 @@ async function SearchResults({ param }: { param: string }) {
 
   const results = await db.execute(query);
 
-  const rows = results.rows as { title: string; content: string }[];
+  const rows: { title: string; content: string }[] = IS_LOCAL
+    ? results
+    : (results as any).rows;
 
   return rows.map(
     ({ title, content: rawContent }: { title: string; content: string }) => {

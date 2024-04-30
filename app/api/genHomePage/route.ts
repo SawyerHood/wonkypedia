@@ -1,5 +1,5 @@
 import { generateHomepage } from "@/generation/homepage";
-import { kv } from "@vercel/kv";
+import { set } from "@/shared/kv";
 import { revalidatePath } from "next/cache";
 
 export async function GET(req: Request) {
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
     return new Response(null, { status: 401 });
   }
   const homepage = await generateHomepage();
-  kv.set("homepage", homepage);
+  await set("homepage", homepage);
   revalidatePath("/api/homepage");
   return new Response(JSON.stringify(homepage), {
     headers: {

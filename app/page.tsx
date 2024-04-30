@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/ui/Card";
 import { headers } from "next/headers";
+import cx from "classnames";
 
 export const revalidate = 60 * 60;
 
@@ -26,7 +27,7 @@ export default async function Home() {
     summaryTitle: string;
     didYouKnow: string;
     didYouKnowImage: string;
-  } = data;
+  } | null = data;
 
   return (
     <div className="max-w-screen-lg mx-auto p-4 flex flex-col items-center min-w-min">
@@ -34,7 +35,9 @@ export default async function Home() {
         <Card
           colorScheme="gray"
           title="What is Wonkypedia?"
-          className="col-start-1"
+          className={cx("col-start-1", {
+            "col-span-1 md:col-span-2": !homepageInfo,
+          })}
         >
           <p className="mb-4">
             Wonkypedia is a free encyclopedia for an alternative universe. It is
@@ -45,42 +48,48 @@ export default async function Home() {
             Browse New Articles...
           </Link>
         </Card>
-        <Card
-          colorScheme="blue"
-          title="From the Article of the Day"
-          className="md:col-start-1"
-        >
-          <Image
-            src={homepageInfo.summaryImage}
-            alt="Summary Image"
-            width={148}
-            height={148}
-            className="float-right ml-4 mb-4"
-          />
-          <MarkdownRenderer markdown={transformLinks(homepageInfo.summary)} />
-          <Link
-            href={`/article/${homepageInfo.summaryTitle}`}
-            className="text-blue-500 hover:underline"
-          >
-            Read More...
-          </Link>
-        </Card>
-        <Card
-          colorScheme="green"
-          title="Did You Know?"
-          className="md:col-start-2 md:row-start-1 md:row-span-2"
-        >
-          <Image
-            src={homepageInfo.didYouKnowImage}
-            alt="Did You Know Image"
-            width={148}
-            height={148}
-            className="float-right ml-4 mb-4"
-          />
-          <MarkdownRenderer
-            markdown={transformLinks(homepageInfo.didYouKnow)}
-          />
-        </Card>
+        {homepageInfo && (
+          <>
+            <Card
+              colorScheme="blue"
+              title="From the Article of the Day"
+              className="md:col-start-1"
+            >
+              <Image
+                src={homepageInfo.summaryImage}
+                alt="Summary Image"
+                width={148}
+                height={148}
+                className="float-right ml-4 mb-4"
+              />
+              <MarkdownRenderer
+                markdown={transformLinks(homepageInfo.summary)}
+              />
+              <Link
+                href={`/article/${homepageInfo.summaryTitle}`}
+                className="text-blue-500 hover:underline"
+              >
+                Read More...
+              </Link>
+            </Card>
+            <Card
+              colorScheme="green"
+              title="Did You Know?"
+              className="md:col-start-2 md:row-start-1 md:row-span-2"
+            >
+              <Image
+                src={homepageInfo.didYouKnowImage}
+                alt="Did You Know Image"
+                width={148}
+                height={148}
+                className="float-right ml-4 mb-4"
+              />
+              <MarkdownRenderer
+                markdown={transformLinks(homepageInfo.didYouKnow)}
+              />
+            </Card>
+          </>
+        )}
         <Card
           colorScheme="purple"
           className="col-span-1 md:col-span-2"

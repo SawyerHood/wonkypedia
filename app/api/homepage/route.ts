@@ -1,7 +1,9 @@
-import kv from "@vercel/kv";
+import { get } from "@/shared/kv";
 
 export async function GET() {
-  const homepage = await kv.get("homepage");
+  const homepage = await get("homepage");
+
+  console.log(homepage);
 
   return new Response(JSON.stringify(homepage), {
     headers: {

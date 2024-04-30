@@ -1,9 +1,13 @@
-import { drizzle } from "drizzle-orm/vercel-postgres";
-import { sql } from "@vercel/postgres";
-import * as schema from "@/drizzle/schema";
+import { createDB as createVercelDB } from "./vercelClient";
+import { createDB as createPgDB } from "./pgClient";
+import { IS_LOCAL } from "@/shared/config";
 
-export const db = drizzle(sql, { schema });
+let db: ReturnType<typeof createVercelDB> | null = null;
 
 export const getDb = () => {
-  return db;
+  if (!db) {
+    db = IS_LOCAL ? (createPgDB() as any) : createVercelDB();
+  }
+
+  return db!;
 };

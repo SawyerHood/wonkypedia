@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Header from "@/ui/Header";
+import { IS_LOCAL } from "@/shared/config";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description: "Wikipedia for a different dimension",
 };
 
-export const runtime = "edge";
+export const runtime = IS_LOCAL ? "nodejs" : "edge";
 
 export default function RootLayout({
   children,

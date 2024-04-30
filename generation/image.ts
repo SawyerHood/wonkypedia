@@ -1,4 +1,4 @@
-import { put } from "@vercel/blob";
+import { put } from "@/shared/put";
 
 export async function genCloudflareImage(prompt: string): Promise<Blob | null> {
   const options = {
@@ -64,9 +64,7 @@ export async function genAndUploadImage(prompt: string) {
     return null;
   }
 
-  const res = await put(`images/${key}.jpg`, blob, {
-    access: "public",
-  });
+  const res = await put(`images/${key}.jpg`, blob);
 
-  return res.url;
+  return res;
 }

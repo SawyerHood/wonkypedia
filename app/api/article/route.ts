@@ -6,7 +6,6 @@ import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const title = req.nextUrl.searchParams.get("title");
-  console.log(title);
   if (!title) {
     return new Response("No title provided", { status: 400 });
   }

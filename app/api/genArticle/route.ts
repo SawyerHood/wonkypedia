@@ -9,25 +9,27 @@ import { generateInfobox } from "@/generation/infobox";
 import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
 import { ChatCompletionCreateParamsStreaming } from "openai/resources/index.mjs";
-import { WRITE_TO_DB } from "@/shared/config";
+import { IS_LOCAL, WRITE_TO_DB } from "@/shared/config";
 import { getDb } from "@/db/client";
 import { articles, links } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { genAndUploadImage } from "@/generation/image";
 
-export const runtime = "edge";
+export const runtime = IS_LOCAL ? "nodejs" : "edge";
 
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
   const { title } = await req.json();
 
-  const session = await auth();
+  if (!IS_LOCAL) {
+    const session = await auth();
 
-  if (!session) {
-    return new Response("Please login to generate an article", {
-      status: 401,
-    });
+    if (!session) {
+      return new Response("Please login to generate an article", {
+        status: 401,
+      });
+    }
   }
 
   const articleStream = await createArticleStream(title);
@@ -89,15 +91,9 @@ export async function POST(req: Request) {
           controller.enqueue(encodeMessage({ type: "article-chunk", value }));
         }
         const article = extractArticle(articleResult ?? "");
-        // const linkified = await linkify(article ?? "");
-        const linkified = article ?? "";
-        controller.enqueue(
-          encodeMessage({ type: "linkify", value: linkified })
-        );
-        await saveToDatabase(title, linkified);
+        await saveToDatabase(title, article ?? "");
         await infoBoxPromise;
         await new Promise((resolve) => setTimeout(resolve, 50));
-        console.log(articleResult);
         controller.close();
       },
     }).pipeThrough(new TextEncoderStream()),

@@ -3,7 +3,7 @@ const nextConfig = {
   webpack: (config, { webpack }) => {
     config.plugins.push(
       new webpack.IgnorePlugin({
-        resourceRegExp: /^pg-native$|^cloudflare:sockets$/,
+        resourceRegExp: /^cloudflare:sockets$/,
       })
     );
 
@@ -16,6 +16,9 @@ const nextConfig = {
       },
       {
         hostname: "mynvsgmvogwjsrrm.public.blob.vercel-storage.com",
+      },
+      {
+        hostname: "localhost",
       },
     ],
   },

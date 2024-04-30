@@ -3,6 +3,7 @@ import { uriToTitle } from "@/shared/articleUtils";
 import { auth } from "@/auth";
 import { LoginBlock } from "@/ui/LoginBlock";
 import { headers } from "next/headers";
+import { IS_LOCAL } from "@/shared/config";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,10 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const title = uriToTitle(params.slug);
-  const session = await auth();
+  let session = null;
+  if (!IS_LOCAL) {
+    session = await auth();
+  }
   const origin = headers().get("origin") ?? headers().get("host");
   const resp = await fetch(
     `${
@@ -41,7 +45,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
     <Article
       title={title}
       article={article}
-      isLoggedIn={!!session}
+      isLoggedIn={IS_LOCAL || !!session}
       loginSection={<LoginBlock />}
     />
   );
