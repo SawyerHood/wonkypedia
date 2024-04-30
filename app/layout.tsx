@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Wikipedia for a different dimension",
 };
 
-export const runtime = IS_LOCAL ? "nodejs" : "edge";
+export const runtime = "edge";
 
 export default function RootLayout({
   children,

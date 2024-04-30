@@ -16,7 +16,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { genAndUploadImage } from "@/generation/image";
 
-export const runtime = IS_LOCAL ? "nodejs" : "edge";
+export const runtime = "edge";
 
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
