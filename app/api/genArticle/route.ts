@@ -4,7 +4,7 @@ import {
   createMarkdown,
   extractArticle,
 } from "@/shared/articleUtils";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { generateInfobox } from "@/generation/infobox";
 import { encodeMessage } from "@/shared/encoding";
 import { getMessageCreateParams } from "@/generation/articlePrompt";
@@ -14,6 +14,7 @@ import { getDb } from "@/db/client";
 import { articles, links } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
+import { genAndUploadImage } from "@/generation/image";
 
 export const runtime = "edge";
 
@@ -57,23 +58,14 @@ export async function POST(req: Request) {
           );
 
           if (infoBox.imageDescription) {
-            // const image = await genAndUploadImage(infoBox.imageDescription);
-            console.log(`${req.headers.get("origin")}/api/genImage`);
-            console.log("fetching image");
-            const imageRequest = await fetch(
-              `${req.headers.get("origin")}/api/genImage`,
-              {
-                method: "POST",
-                body: JSON.stringify({ prompt: infoBox.imageDescription }),
-              }
-            );
-            const image = await imageRequest.json();
-            if (image.url) {
-              await saveImageToDatabase(title, image.url);
+            const image = await genAndUploadImage(infoBox.imageDescription);
+
+            if (image) {
+              await saveImageToDatabase(title, image);
               controller.enqueue(
                 encodeMessage({
                   type: "image",
-                  value: image.url,
+                  value: image,
                 })
               );
             }

@@ -5,11 +5,10 @@ import {
   timestamp,
   jsonb,
   bigint,
-  foreignKey,
   primaryKey,
   integer,
 } from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import type { AdapterAccount } from "next-auth/adapters";
 
 export const keyStatus = pgEnum("key_status", [
