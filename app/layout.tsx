@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   description: "Wikipedia for a different dimension",
 };
 
-export const runtime = "edge";
+export const runtime =
+  process.env.NODE_ENV === "development" ? "nodejs" : "edge";
 
 export default function RootLayout({
   children,
