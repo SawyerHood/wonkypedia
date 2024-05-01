@@ -6,7 +6,10 @@ let db: ReturnType<typeof createVercelDB> | null = null;
 
 export const getDb = () => {
   if (!db) {
-    db = IS_LOCAL ? (createPgDB() as any) : createVercelDB();
+    db =
+      IS_LOCAL && process.env.NODE_ENV === "development"
+        ? (createPgDB() as any)
+        : createVercelDB();
   }
 
   return db!;

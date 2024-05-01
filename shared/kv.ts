@@ -2,7 +2,7 @@ import { IS_LOCAL } from "./config";
 import { kv } from "@vercel/kv";
 
 export async function set(key: string, value: any): Promise<any> {
-  if (IS_LOCAL) {
+  if (IS_LOCAL && process.env.NODE_ENV === "development") {
     const fs = await import("fs-extra");
     // Write to file system
     const appRoot = process.cwd();
@@ -16,7 +16,7 @@ export async function set(key: string, value: any): Promise<any> {
 }
 
 export async function get(key: string): Promise<unknown | null> {
-  if (IS_LOCAL) {
+  if (IS_LOCAL && process.env.NODE_ENV === "development") {
     const fs = await import("fs-extra");
     const appRoot = process.cwd();
     if (await exists(`${appRoot}/public/kv/${key}.json`)) {
@@ -31,11 +31,14 @@ export async function get(key: string): Promise<unknown | null> {
 }
 
 async function exists(path: string) {
-  const fs = await import("fs-extra");
-  try {
-    await fs.access(path);
-    return true;
-  } catch (error) {
-    return false;
+  if (IS_LOCAL && process.env.NODE_ENV === "development") {
+    const fs = await import("fs-extra");
+    try {
+      await fs.access(path);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
+  return false;
 }

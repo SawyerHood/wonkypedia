@@ -1,9 +1,12 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 import * as schema from "@/drizzle/schema";
 
-export function createDB() {
-  const queryClient = postgres(process.env.POSTGRES_URL!);
-  const db = drizzle(queryClient, { schema });
-  return db;
-}
+export const createDB =
+  process.env.NODE_ENV === "development"
+    ? () => {
+        const postgres = require("postgres");
+        const { drizzle } = require("drizzle-orm/postgres-js");
+        const queryClient = postgres(process.env.POSTGRES_URL!);
+        const db = drizzle(queryClient, { schema });
+        return db;
+      }
+    : () => null;

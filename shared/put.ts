@@ -2,7 +2,7 @@ import { put as vercelPut } from "@vercel/blob";
 import { IS_LOCAL } from "./config";
 
 export async function put(path: string, blob: Blob) {
-  if (IS_LOCAL) {
+  if (IS_LOCAL && process.env.NODE_ENV === "development") {
     const fs = await import("fs-extra");
 
     const buffer = await blob.arrayBuffer();
