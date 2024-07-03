@@ -19,15 +19,21 @@ export default async function Home() {
   const resp = await fetch(`${baseURL}/api/homepage`, {
     next: { revalidate: 60 * 60 },
   });
-  const data = await resp.json();
+  let data;
+  try {
+    data = await resp.json();
+  } catch (e) {
+    console.error(e);
+  }
 
   const homepageInfo: {
     summary: string;
-    summaryImage: string;
+    summaryImage?: string;
     summaryTitle: string;
     didYouKnow: string;
-    didYouKnowImage: string;
+    didYouKnowImage?: string;
   } | null = data;
+  console.log(homepageInfo);
 
   return (
     <div className="max-w-screen-lg mx-auto p-4 flex flex-col items-center min-w-min">
@@ -55,13 +61,15 @@ export default async function Home() {
               title="From the Article of the Day"
               className="md:col-start-1"
             >
-              <Image
-                src={homepageInfo.summaryImage}
-                alt="Summary Image"
-                width={148}
-                height={148}
-                className="float-right ml-4 mb-4"
-              />
+              {homepageInfo.summaryImage && (
+                <Image
+                  src={homepageInfo.summaryImage}
+                  alt="Summary Image"
+                  width={148}
+                  height={148}
+                  className="float-right ml-4 mb-4"
+                />
+              )}
               <MarkdownRenderer
                 markdown={transformLinks(homepageInfo.summary)}
               />
@@ -77,13 +85,15 @@ export default async function Home() {
               title="Did You Know?"
               className="md:col-start-2 md:row-start-1 md:row-span-2"
             >
-              <Image
-                src={homepageInfo.didYouKnowImage}
-                alt="Did You Know Image"
-                width={148}
-                height={148}
-                className="float-right ml-4 mb-4"
-              />
+              {homepageInfo.didYouKnowImage && (
+                <Image
+                  src={homepageInfo.didYouKnowImage}
+                  alt="Did You Know Image"
+                  width={148}
+                  height={148}
+                  className="float-right ml-4 mb-4"
+                />
+              )}
               <MarkdownRenderer
                 markdown={transformLinks(homepageInfo.didYouKnow)}
               />
